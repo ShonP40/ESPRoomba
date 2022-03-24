@@ -1,0 +1,53 @@
+// Config // (Rename this file to `config.h`)
+
+// Debug
+#define DEBUG false
+
+// WiFi
+#define WIFI_SSID ""
+#define WIFI_PASSWORD ""
+
+// Static routing
+#define STATIC_IP false
+
+#define LOCAL_IP 0, 0, 0, 0;
+#define GATEWAY 0, 0, 0, 0;
+#define SUBNET 0, 0, 0, 0;
+#define PRIMARYDNS 0, 0, 0, 0;
+#define SECONDARYDNS 0, 0, 0, 0;
+
+// OTA
+#define OTA_PASSWORD ""
+#define OTA_PORT 0
+
+// Clock
+#define UTC_OFFSET 0 // In seconds
+
+// MQTT
+#define MQTT_SERVER ""
+#define MQTT_PORT 0
+#define MQTT_USER ""
+#define MQTT_PASS ""
+#define MQTT_CLIENT_NAME "roomba"
+
+#define MQTT_STATUS_TOPIC "roomba/status"
+#define MQTT_BOOT_STATUS_TOPIC "roomba/boot-status"
+#define MQTT_COMMANDS_TOPIC "roomba/commands"
+#define MQTT_BATTERY_TOPIC "roomba/battery"
+#define MQTT_CHARGING_TOPIC "roomba/charging"
+#define MQTT_VIRTUAL_WALL_TOPIC "roomba/virtual-wall"
+#define MQTT_RUNNING_INDICATOR_TOPIC "roomba/running-indicator"
+
+#if DEBUG
+#define MQTT_DAY_TOPIC "roomba/day"
+#define MQTT_HOUR_TOPIC "roomba/hour"
+#define MQTT_MINUTES_TOPIC "roomba/minutes"
+#endif
+
+#define MQTT_BATTERY_TEMPERATURE_TOPIC "roomba/battery-temperature"
+#define MQTT_BATTERY_VOLTAGE_TOPIC "roomba/battery-voltage"
+#define MQTT_POWER_USAGE_TOPIC "roomba/power-usage"
+#define MQTT_RIGHT_MOTOR_CURRENT_TOPIC "roomba/right-motor-current"
+#define MQTT_LEFT_MOTOR_CURRENT_TOPIC "roomba/left-motor-current"
+#define MQTT_MAIN_BRUSH_MOTOR_CURRENT_TOPIC "roomba/main-brush-motor-current"
+#define MQTT_SIDE_BRUH_MOTOR_CURRENT_TOPIC "roomba/side-brush-motor-current"
