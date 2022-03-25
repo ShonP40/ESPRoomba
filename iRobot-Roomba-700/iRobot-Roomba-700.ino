@@ -38,10 +38,11 @@ WiFiClient espClient;
 PubSubClient client(espClient);
 Roomba roomba(&Serial, Roomba::Baud115200);
 //////////////////////////////////////////////////////////////////////////// Variables
-bool toggle = true;
 const int noSleepPin = 2;
-bool boot = true;
 uint8_t tempBuf[10];
+#if DEBUG
+bool boot = true;
+#endif
 
 // MQTT
 char mqtt_send_package[50];
@@ -94,6 +95,7 @@ void reconnect() {
         if (retries < 50) {
             // Attempt to connect
             if (client.connect(mqtt_client_name, mqtt_user, mqtt_pass, MQTT_STATUS_TOPIC, 0, 0, "Dead Somewhere")) {
+                #if DEBUG
                 // Once connected, publish an announcement...
                 if (boot == false) {
                     client.publish(MQTT_BOOT_STATUS_TOPIC, "Reconnected");
@@ -102,6 +104,7 @@ void reconnect() {
                     client.publish(MQTT_BOOT_STATUS_TOPIC, "Rebooted");
                     boot = false;
                 }
+                #endif
                 // ... and resubscribe
                 client.subscribe(MQTT_COMMANDS_TOPIC);
             } else {
