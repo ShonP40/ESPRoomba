@@ -48,6 +48,7 @@ bool boot = true;
 char mqtt_send_package[50];
 
 // Battery
+int nBatPcent;
 long battery_Current_mAh = 0;
 long charging_state = 0;
 long battery_Total_mAh = 0;
@@ -201,7 +202,7 @@ void sendInfoRoomba() {
     battery_Total_mAh = tempBuf[1] + 256 * tempBuf[0];
 
     if (battery_Total_mAh != 0) {
-        int nBatPcent = 100 * battery_Current_mAh / battery_Total_mAh;
+        nBatPcent = 100 * battery_Current_mAh / battery_Total_mAh;
         packageAndSendMQTT(String(nBatPcent), MQTT_BATTERY_TOPIC);
     }
     
@@ -235,6 +236,9 @@ void sendInfoRoomba() {
         roomba_cleaning = false;
         roomba_returning = false;
         roomba_halted = false;
+    } else if (nBatPcent > 97 && !roomba_running) {
+        client.publish(MQTT_STATUS_TOPIC, "Charging");
+        charging = true;
     } else {
         charging = false;
     }
@@ -348,6 +352,8 @@ void roombaCommandedStatus(int status) {
 void roombaStatus() {
     if (roomba_running && !roomba_cleaning && !roomba_returning) {
         roombaCommandedStatus(1);
+    } else if (roomba_running && roomba_cleaning) {
+        roombaCommandedStatus(1);
     } else if (roomba_running && roomba_returning) {
         roombaCommandedStatus(2);
     } else if (!roomba_running && !charging) {
@@ -355,17 +361,28 @@ void roombaStatus() {
     }
 }
 
+void awakeFromDeepSleep() {
+    if (charging) {
+        Serial.write(128);
+        delay(50);
+        Serial.write(135);
+        delay(50);
+    }
+}
+
 void stopCleaning() {
     Serial.write(128);
     delay(50);
-    Serial.write(135);
+    Serial.write(131);
+    delay(50);
+    Serial.write(173);
     delay(50);
     roombaCommandedStatus(3);
 }
 
 void startCleaning() {
     awake();
-    stopCleaning();
+    awakeFromDeepSleep();
     delay(50);
     Serial.write(128);
     delay(50);
@@ -378,7 +395,7 @@ void startCleaning() {
 
 void goHome() {
     awake();
-    stopCleaning();
+    awakeFromDeepSleep();
     delay(50);
     Serial.write(128);
     delay(50);
