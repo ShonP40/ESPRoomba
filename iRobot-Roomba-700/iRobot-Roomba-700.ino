@@ -68,6 +68,9 @@ long left_motor_current = 0;
 long main_brush_motor_current = 0;
 
 long side_brush_motor_current = 0;
+
+// Running indicator
+bool roomba_running;
 //////////////////////////////////////////////////////////////////////////// Time
 WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP, "pool.ntp.org", UTC_OFFSET);
@@ -119,46 +122,28 @@ void callback(char* topic, byte* payload, unsigned int length) {
     String newPayload = String((char *)payload);
     if (newTopic == MQTT_COMMANDS_TOPIC) {
         if (newPayload == "start") {
-        startCleaning();
+            startCleaning();
         }
         if (newPayload == "stop") {
-        stopCleanig();
+            stopCleanig();
         }
         if (newPayload == "home") {
-        goHome();
+            goHome();
         }
         if (newPayload == "clock") {
-        setTimeAndDate();
+            setTimeAndDate();
         }
     }
 }
 
-
-void startCleaning() {
-    awake();
-    Serial.write(128);
-    delay(50);
-    Serial.write(131);
-    delay(50);
-    Serial.write(135);
-    client.publish(MQTT_STATUS_TOPIC, "Cleaning");
-}
-
-void stopCleanig() {
-    Serial.write(128);
-    delay(50);
-    Serial.write(135);
-    client.publish(MQTT_STATUS_TOPIC, "Halted");
-}
-
-void goHome() {
-    awake();
-    Serial.write(128);
-    delay(50);
-    Serial.write(131);
-    delay(50);
-    Serial.write(143);
-    client.publish(MQTT_STATUS_TOPIC, "Returning");
+void awake() {
+    digitalWrite(noSleepPin, HIGH);
+    delay(1000);
+    digitalWrite(noSleepPin, LOW);
+    delay(1000);
+    digitalWrite(noSleepPin, HIGH);
+    delay(1000);
+    digitalWrite(noSleepPin, LOW);
 }
 
 void packageAndSendMQTT(String value, char* topic) { // Package up the data and send it to the MQTT server
@@ -245,9 +230,9 @@ void sendInfoRoomba() {
     virtual_wall = tempBuf[0];
 
     if (virtual_wall == 0) {
-      client.publish(MQTT_VIRTUAL_WALL_TOPIC, "Not Detected");
+        client.publish(MQTT_VIRTUAL_WALL_TOPIC, "Not Detected");
     } else if (virtual_wall == 1) {
-      client.publish(MQTT_VIRTUAL_WALL_TOPIC, "Detected");
+        client.publish(MQTT_VIRTUAL_WALL_TOPIC, "Detected");
     }
 
     // Battery voltage
@@ -299,22 +284,51 @@ void sendInfoRoomba() {
     // Power indicator
 
     if (right_motor_current + left_motor_current + main_brush_motor_current + side_brush_motor_current > 0) {
-      client.publish(MQTT_RUNNING_INDICATOR_TOPIC, "Running");
+        #if DEBUG
+        client.publish(MQTT_RUNNING_INDICATOR_TOPIC, "Running");
+        #endif
+        roomba_running = true;
     } else {
-      client.publish(MQTT_RUNNING_INDICATOR_TOPIC, "Idle");
+        #if DEBUG
+        client.publish(MQTT_RUNNING_INDICATOR_TOPIC, "Idle");
+        #endif
+        roomba_running = false;
     }
 }
 
-void awake() {
-    digitalWrite(noSleepPin, HIGH);
-    delay(1000);
-    digitalWrite(noSleepPin, LOW);
-    delay(1000);
-    digitalWrite(noSleepPin, HIGH);
-    delay(1000);
-    digitalWrite(noSleepPin, LOW);
+void startCleaning() {
+    awake();
+    Serial.write(128);
+    delay(50);
+    Serial.write(131);
+    delay(50);
+    Serial.write(135);
+    while (roomba_running) {
+        client.publish(MQTT_STATUS_TOPIC, "Cleaning");
+        delay(1000);
+    }
 }
 
+void stopCleanig() {
+    Serial.write(128);
+    delay(50);
+    Serial.write(135);
+    delay(50);
+    client.publish(MQTT_STATUS_TOPIC, "Halted");
+}
+
+void goHome() {
+    awake();
+    Serial.write(128);
+    delay(50);
+    Serial.write(131);
+    delay(50);
+    Serial.write(143);
+    while (roomba_running) {
+        client.publish(MQTT_STATUS_TOPIC, "Returning");
+        delay(1000);
+    }
+}
 
 void setup() {
     // Configure the serial interface
@@ -341,6 +355,10 @@ void setup() {
 
     // Time
     timeClient.begin();
+    delay(1000);
+    timeClient.update();
+    delay(1000);
+    setTimeAndDate();
 }
 
 void loop() {

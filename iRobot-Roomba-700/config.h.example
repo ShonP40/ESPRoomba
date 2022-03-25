@@ -18,14 +18,14 @@
 
 // OTA
 #define OTA_PASSWORD ""
-#define OTA_PORT 0
+#define OTA_PORT 8266
 
 // Clock
 #define UTC_OFFSET 0 // In seconds
 
 // MQTT
 #define MQTT_SERVER ""
-#define MQTT_PORT 0
+#define MQTT_PORT 1883
 #define MQTT_USER ""
 #define MQTT_PASS ""
 #define MQTT_CLIENT_NAME "roomba"
@@ -36,9 +36,9 @@
 #define MQTT_BATTERY_TOPIC "roomba/battery"
 #define MQTT_CHARGING_TOPIC "roomba/charging"
 #define MQTT_VIRTUAL_WALL_TOPIC "roomba/virtual-wall"
-#define MQTT_RUNNING_INDICATOR_TOPIC "roomba/running-indicator"
 
 #if DEBUG
+#define MQTT_RUNNING_INDICATOR_TOPIC "roomba/running-indicator"
 #define MQTT_DAY_TOPIC "roomba/day"
 #define MQTT_HOUR_TOPIC "roomba/hour"
 #define MQTT_MINUTES_TOPIC "roomba/minutes"
