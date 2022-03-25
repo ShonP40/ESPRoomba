@@ -52,6 +52,7 @@ long battery_Current_mAh = 0;
 long charging_state = 0;
 long battery_Total_mAh = 0;
 
+#if SENSORS
 long battery_Temperature = 0;
 
 long battery_voltage = 0;
@@ -60,6 +61,7 @@ long power_usage = 0;
 
 // Virtual Wall
 long virtual_wall = 0;
+#endif
 
 // Motor Current
 long right_motor_current = 0;
@@ -228,6 +230,7 @@ void sendInfoRoomba() {
         client.publish(MQTT_STATUS_TOPIC, "Charging");
     }
 
+    #if SENSORS
     // Battery temperature
     roomba.getSensors(24, tempBuf, 1);
     battery_Temperature = tempBuf[0];
@@ -259,6 +262,7 @@ void sendInfoRoomba() {
     int nPwrUsage = power_usage / 1000;
 
     packageAndSendMQTT(String(nPwrUsage), MQTT_POWER_USAGE_TOPIC);
+    #endif
 
     // Motor current & Power indicator //
 
@@ -266,29 +270,33 @@ void sendInfoRoomba() {
 
     roomba.getSensors(55, tempBuf, 2);
     right_motor_current = tempBuf[1] + 256 * tempBuf[0];
-
+    #if SENSORS
     packageAndSendMQTT(String(right_motor_current), MQTT_RIGHT_MOTOR_CURRENT_TOPIC);
+    #endif
 
     // Left Motor
 
     roomba.getSensors(54, tempBuf, 2);
     left_motor_current = tempBuf[1] + 256 * tempBuf[0];
-
+    #if SENSORS
     packageAndSendMQTT(String(left_motor_current), MQTT_LEFT_MOTOR_CURRENT_TOPIC);
+    #endif
 
     // Main Brush Motor
 
     roomba.getSensors(56, tempBuf, 2);
     main_brush_motor_current = tempBuf[1] + 256 * tempBuf[0];
-
+    #if SENSORS
     packageAndSendMQTT(String(main_brush_motor_current), MQTT_MAIN_BRUSH_MOTOR_CURRENT_TOPIC);
+    #endif
 
     // Side Brush Motor
 
     roomba.getSensors(57, tempBuf, 2);
     side_brush_motor_current = tempBuf[1] + 256 * tempBuf[0];
-
+    #if SENSORS
     packageAndSendMQTT(String(side_brush_motor_current), MQTT_SIDE_BRUH_MOTOR_CURRENT_TOPIC);
+    #endif
 
     // Power indicator
 

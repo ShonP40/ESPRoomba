@@ -3,6 +3,9 @@
 // Debug
 #define DEBUG false
 
+// Report sensors (virtual wall, power status and battery temperature)
+#define SENSORS false
+
 // WiFi
 #define WIFI_SSID ""
 #define WIFI_PASSWORD ""
@@ -33,7 +36,6 @@
 #define MQTT_STATUS_TOPIC "roomba/status"
 #define MQTT_COMMANDS_TOPIC "roomba/commands"
 #define MQTT_BATTERY_TOPIC "roomba/battery"
-#define MQTT_VIRTUAL_WALL_TOPIC "roomba/virtual-wall"
 
 #if DEBUG
 #define MQTT_BOOT_STATUS_TOPIC "roomba/boot-status"
@@ -44,6 +46,8 @@
 #define MQTT_MINUTES_TOPIC "roomba/minutes"
 #endif
 
+#if SENSORS
+#define MQTT_VIRTUAL_WALL_TOPIC "roomba/virtual-wall"
 #define MQTT_BATTERY_TEMPERATURE_TOPIC "roomba/battery-temperature"
 #define MQTT_BATTERY_VOLTAGE_TOPIC "roomba/battery-voltage"
 #define MQTT_POWER_USAGE_TOPIC "roomba/power-usage"
@@ -51,3 +55,4 @@
 #define MQTT_LEFT_MOTOR_CURRENT_TOPIC "roomba/left-motor-current"
 #define MQTT_MAIN_BRUSH_MOTOR_CURRENT_TOPIC "roomba/main-brush-motor-current"
 #define MQTT_SIDE_BRUH_MOTOR_CURRENT_TOPIC "roomba/side-brush-motor-current"
+#endif
