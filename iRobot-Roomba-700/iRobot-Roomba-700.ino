@@ -141,7 +141,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
         if (newPayload == "stop") {
             stopCleaning();
         }
-        if (newPayload == "home") {
+        if (newPayload == "return_home") {
             returnToDock();
         }
         if (newPayload == "clock") {
