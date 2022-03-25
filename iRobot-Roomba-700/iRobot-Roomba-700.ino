@@ -134,7 +134,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
             startCleaning();
         }
         if (newPayload == "stop") {
-            stopCleanig();
+            stopCleaning();
         }
         if (newPayload == "home") {
             goHome();
@@ -355,7 +355,7 @@ void roombaStatus() {
     }
 }
 
-void stopCleanig() {
+void stopCleaning() {
     Serial.write(128);
     delay(50);
     Serial.write(135);
@@ -365,7 +365,7 @@ void stopCleanig() {
 
 void startCleaning() {
     awake();
-    stopCleanig();
+    stopCleaning();
     delay(50);
     Serial.write(128);
     delay(50);
@@ -378,7 +378,7 @@ void startCleaning() {
 
 void goHome() {
     awake();
-    stopCleanig();
+    stopCleaning();
     delay(50);
     Serial.write(128);
     delay(50);
