@@ -34,10 +34,10 @@
 #define MQTT_BOOT_STATUS_TOPIC "roomba/boot-status"
 #define MQTT_COMMANDS_TOPIC "roomba/commands"
 #define MQTT_BATTERY_TOPIC "roomba/battery"
-#define MQTT_CHARGING_TOPIC "roomba/charging"
 #define MQTT_VIRTUAL_WALL_TOPIC "roomba/virtual-wall"
 
 #if DEBUG
+#define MQTT_CHARGING_TOPIC "roomba/charging"
 #define MQTT_RUNNING_INDICATOR_TOPIC "roomba/running-indicator"
 #define MQTT_DAY_TOPIC "roomba/day"
 #define MQTT_HOUR_TOPIC "roomba/hour"

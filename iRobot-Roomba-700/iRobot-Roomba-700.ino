@@ -198,6 +198,7 @@ void sendInfoRoomba() {
         client.publish(MQTT_BATTERY_TOPIC, "NO DATA");
     }
     
+    # if DEBUG
     switch (charging_state) {
       case 0:
         client.publish(MQTT_CHARGING_TOPIC, "Not Charging");
@@ -217,6 +218,11 @@ void sendInfoRoomba() {
       case 5:
         client.publish(MQTT_CHARGING_TOPIC, "Error");
         break;
+    }
+    #endif
+
+    if (charging_state == 1 || charging_state == 2 || charging_state == 3) {
+        client.publish(MQTT_STATUS_TOPIC, "Charging");
     }
 
     // Battery temperature
