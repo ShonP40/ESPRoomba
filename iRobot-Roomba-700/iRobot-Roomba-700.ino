@@ -40,6 +40,7 @@ Roomba roomba(&Serial, Roomba::Baud115200);
 //////////////////////////////////////////////////////////////////////////// Variables
 const int noSleepPin = 2;
 uint8_t tempBuf[10];
+
 #if DEBUG
 bool boot = true;
 #endif
@@ -84,6 +85,7 @@ WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP, "pool.ntp.org", UTC_OFFSET);
 //////////////////////////////////////////////////////////////////////////// Functions
 
+// Configure the WiFi interface
 void setup_wifi() {
     #if STATIC_IP
     WiFi.config(local_IP, gateway, subnet, primaryDNS, secondaryDNS);
@@ -95,6 +97,7 @@ void setup_wifi() {
     }
 }
 
+// Reconnect to WiFi & MQTT
 void reconnect() {
     // Loop until we're reconnected
     int retries = 0;
@@ -126,6 +129,7 @@ void reconnect() {
     }
 }
 
+// Receive MQTT commands
 void callback(char* topic, byte* payload, unsigned int length) {
     String newTopic = topic;
     payload[length] = '\0';
@@ -138,14 +142,21 @@ void callback(char* topic, byte* payload, unsigned int length) {
             stopCleaning();
         }
         if (newPayload == "home") {
-            goHome();
+            returnToDock();
         }
         if (newPayload == "clock") {
             setTimeAndDate();
         }
+        if (newPayload == "restartESP") {
+            ESP.restart();
+        }
+        if (newPayload == "restartRoomba") {
+            restartRoomba();
+        }
     }
 }
 
+// Wake up the Roomba from normal sleep
 void awake() {
     digitalWrite(noSleepPin, HIGH);
     delay(1000);
@@ -156,33 +167,10 @@ void awake() {
     digitalWrite(noSleepPin, LOW);
 }
 
-void packageAndSendMQTT(String value, char* topic) { // Package up the data and send it to the MQTT server
+// Package up the provided data and send it to the MQTT broker
+void packageAndSendMQTT(String value, char* topic) {
     value.toCharArray(mqtt_send_package, value.length() + 1);
     client.publish(topic, mqtt_send_package);
-}
-
-void setTimeAndDate() {
-    #if DEBUG
-    // Day
-    packageAndSendMQTT(String(timeClient.getDay()), MQTT_DAY_TOPIC);
-
-    // Hour
-    packageAndSendMQTT(String(timeClient.getHours()), MQTT_HOUR_TOPIC);
-    
-    // Minutes
-    packageAndSendMQTT(String(timeClient.getMinutes()), MQTT_MINUTES_TOPIC);
-    #endif
-
-    awake();
-    Serial.write(128);
-    delay(50);
-    Serial.write(168);
-    delay(50);
-    Serial.write(timeClient.getDay());
-    delay(50);
-    Serial.write(timeClient.getHours());
-    delay(50);
-    Serial.write(timeClient.getMinutes());
 }
 
 void sendInfoRoomba() {
@@ -194,19 +182,23 @@ void sendInfoRoomba() {
     charging_state = tempBuf[0];
     delay(50);
 
+    // Get the current battery capacity
     roomba.getSensors(25, tempBuf, 2);
     battery_Current_mAh = tempBuf[1] + 256 * tempBuf[0];
     delay(50);
 
+    // Get the maximum battery capacity
     roomba.getSensors(26, tempBuf, 2);
     battery_Total_mAh = tempBuf[1] + 256 * tempBuf[0];
 
+    // Calculate battery percentage
     if (battery_Total_mAh != 0) {
         nBatPcent = 100 * battery_Current_mAh / battery_Total_mAh;
         packageAndSendMQTT(String(nBatPcent), MQTT_BATTERY_TOPIC);
     }
     
     # if DEBUG
+    // Get and report the advanced charging status
     switch (charging_state) {
       case 0:
         client.publish(MQTT_CHARGING_TOPIC, "Not Charging");
@@ -229,6 +221,7 @@ void sendInfoRoomba() {
     }
     #endif
 
+    // Fetch/Guess and report the charging state
     if (charging_state == 1 || charging_state == 2 || charging_state == 3) {
         client.publish(MQTT_STATUS_TOPIC, "Charging");
         charging = true;
@@ -280,7 +273,6 @@ void sendInfoRoomba() {
     // Motor current & Power indicator //
 
     // Right Motor
-
     roomba.getSensors(55, tempBuf, 2);
     right_motor_current = tempBuf[1] + 256 * tempBuf[0];
     #if SENSORS
@@ -288,7 +280,6 @@ void sendInfoRoomba() {
     #endif
 
     // Left Motor
-
     roomba.getSensors(54, tempBuf, 2);
     left_motor_current = tempBuf[1] + 256 * tempBuf[0];
     #if SENSORS
@@ -296,7 +287,6 @@ void sendInfoRoomba() {
     #endif
 
     // Main Brush Motor
-
     roomba.getSensors(56, tempBuf, 2);
     main_brush_motor_current = tempBuf[1] + 256 * tempBuf[0];
     #if SENSORS
@@ -304,7 +294,6 @@ void sendInfoRoomba() {
     #endif
 
     // Side Brush Motor
-
     roomba.getSensors(57, tempBuf, 2);
     side_brush_motor_current = tempBuf[1] + 256 * tempBuf[0];
     #if SENSORS
@@ -312,7 +301,6 @@ void sendInfoRoomba() {
     #endif
 
     // Power indicator
-
     if (right_motor_current + left_motor_current + main_brush_motor_current + side_brush_motor_current > 0) {
         #if DEBUG
         client.publish(MQTT_RUNNING_INDICATOR_TOPIC, "Running");
@@ -326,6 +314,7 @@ void sendInfoRoomba() {
     }
 }
 
+// Set the commanded state and report to MQTT
 void roombaCommandedStatus(int status) {
     switch (status) {
         case 1:
@@ -349,6 +338,7 @@ void roombaCommandedStatus(int status) {
     }
 }
 
+// Guess the Roomba's current status
 void roombaStatus() {
     if (roomba_running && !roomba_cleaning && !roomba_returning) {
         roombaCommandedStatus(1);
@@ -361,6 +351,7 @@ void roombaStatus() {
     }
 }
 
+// Wake up from deep sleep (when docked)
 void awakeFromDeepSleep() {
     if (charging) {
         Serial.write(128);
@@ -370,6 +361,7 @@ void awakeFromDeepSleep() {
     }
 }
 
+// Stop the Roomba
 void stopCleaning() {
     Serial.write(128);
     delay(50);
@@ -380,6 +372,7 @@ void stopCleaning() {
     roombaCommandedStatus(3);
 }
 
+// Start cleaning
 void startCleaning() {
     awake();
     awakeFromDeepSleep();
@@ -393,7 +386,8 @@ void startCleaning() {
     roombaCommandedStatus(1);
 }
 
-void goHome() {
+// Return to the dock
+void returnToDock() {
     awake();
     awakeFromDeepSleep();
     delay(50);
@@ -404,6 +398,45 @@ void goHome() {
     Serial.write(143);
     delay(50);
     roombaCommandedStatus(2);
+}
+
+// Set the Roomba's clock
+void setTimeAndDate() {
+    awake();
+    awakeFromDeepSleep();
+    delay(50);
+    Serial.write(128);
+    delay(50);
+    Serial.write(168);
+    delay(50);
+    Serial.write(timeClient.getDay());
+    delay(50);
+    Serial.write(timeClient.getHours());
+    delay(50);
+    Serial.write(timeClient.getMinutes());
+
+    #if DEBUG
+    // Day
+    packageAndSendMQTT(String(timeClient.getDay()), MQTT_DAY_TOPIC);
+
+    // Hour
+    packageAndSendMQTT(String(timeClient.getHours()), MQTT_HOUR_TOPIC);
+    
+    // Minutes
+    packageAndSendMQTT(String(timeClient.getMinutes()), MQTT_MINUTES_TOPIC);
+    #endif
+}
+
+// Restart the Roomba (same as removing the battery)
+void restartRoomba() {
+    awake();
+    awakeFromDeepSleep();
+    delay(50);
+    Serial.write(128);
+    delay(50);
+    Serial.write(131);
+    delay(50);
+    Serial.write(7);
 }
 
 void setup() {
