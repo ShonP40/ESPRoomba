@@ -9,7 +9,7 @@
 // Your config file
 #include "config.h"
 
-//////////////////////////////////////////////////////////////////////////// Config (Modify this in your `config.h` file)
+//////////////////////////////////////////////////////////////////////////// Main configuration
 // WiFi
 const char* ssid = WIFI_SSID;
 const char* password = WIFI_PASSWORD;
@@ -74,6 +74,10 @@ long side_brush_motor_current = 0;
 
 // Running indicator
 bool roomba_running;
+bool roomba_cleaning;
+bool roomba_returning;
+bool roomba_halted;
+bool charging;
 //////////////////////////////////////////////////////////////////////////// Time
 WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP, "pool.ntp.org", UTC_OFFSET);
@@ -199,8 +203,6 @@ void sendInfoRoomba() {
     if (battery_Total_mAh != 0) {
         int nBatPcent = 100 * battery_Current_mAh / battery_Total_mAh;
         packageAndSendMQTT(String(nBatPcent), MQTT_BATTERY_TOPIC);
-    } else {
-        client.publish(MQTT_BATTERY_TOPIC, "NO DATA");
     }
     
     # if DEBUG
@@ -228,6 +230,13 @@ void sendInfoRoomba() {
 
     if (charging_state == 1 || charging_state == 2 || charging_state == 3) {
         client.publish(MQTT_STATUS_TOPIC, "Charging");
+        charging = true;
+
+        roomba_cleaning = false;
+        roomba_returning = false;
+        roomba_halted = false;
+    } else {
+        charging = false;
     }
 
     #if SENSORS
@@ -313,16 +322,36 @@ void sendInfoRoomba() {
     }
 }
 
-void startCleaning() {
-    awake();
-    Serial.write(128);
-    delay(50);
-    Serial.write(131);
-    delay(50);
-    Serial.write(135);
-    while (roomba_running) {
-        client.publish(MQTT_STATUS_TOPIC, "Cleaning");
-        delay(1000);
+void roombaCommandedStatus(int status) {
+    switch (status) {
+        case 1:
+            roomba_cleaning = true;
+            roomba_returning = false;
+            roomba_halted = false;
+            client.publish(MQTT_STATUS_TOPIC, "Cleaning");
+            break;
+        case 2:
+            roomba_cleaning = false;
+            roomba_returning = true;
+            roomba_halted = false;
+            client.publish(MQTT_STATUS_TOPIC, "Returning");
+            break;
+        case 3:
+            roomba_cleaning = false;
+            roomba_returning = false;
+            roomba_halted = true;
+            client.publish(MQTT_STATUS_TOPIC, "Halted");
+            break;
+    }
+}
+
+void roombaStatus() {
+    if (roomba_running && !roomba_cleaning && !roomba_returning) {
+        roombaCommandedStatus(1);
+    } else if (roomba_running && roomba_returning) {
+        roombaCommandedStatus(2);
+    } else if (!roomba_running && !charging) {
+        roombaCommandedStatus(3);
     }
 }
 
@@ -331,20 +360,33 @@ void stopCleanig() {
     delay(50);
     Serial.write(135);
     delay(50);
-    client.publish(MQTT_STATUS_TOPIC, "Halted");
+    roombaCommandedStatus(3);
+}
+
+void startCleaning() {
+    awake();
+    stopCleanig();
+    delay(50);
+    Serial.write(128);
+    delay(50);
+    Serial.write(131);
+    delay(50);
+    Serial.write(135);
+    delay(50);
+    roombaCommandedStatus(1);
 }
 
 void goHome() {
     awake();
+    stopCleanig();
+    delay(50);
     Serial.write(128);
     delay(50);
     Serial.write(131);
     delay(50);
     Serial.write(143);
-    while (roomba_running) {
-        client.publish(MQTT_STATUS_TOPIC, "Returning");
-        delay(1000);
-    }
+    delay(50);
+    roombaCommandedStatus(2);
 }
 
 void setup() {
@@ -387,6 +429,7 @@ void loop() {
 
     // Roomba info
     sendInfoRoomba();
+    roombaStatus();
     delay(1000);
 
     // MQTT
