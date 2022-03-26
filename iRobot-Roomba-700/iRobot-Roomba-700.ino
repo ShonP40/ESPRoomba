@@ -82,6 +82,9 @@ bool roomba_halted;
 bool charging;
 bool roomba_spot_cleaning;
 bool roomba_max_cleaning;
+
+// Charging Sources Available
+long charging_sources_available = 0;
 //////////////////////////////////////////////////////////////////////////// Functions
 
 // Configure the WiFi interface
@@ -229,6 +232,13 @@ void sendInfoRoomba() {
     }
     #endif
 
+    // Charging Sources Available
+    roomba.getSensors(34, tempBuf, 1);
+    charging_sources_available = tempBuf[0];
+    #if SENSORS
+    packageAndSendMQTT(String(charging_sources_available), MQTT_CHARGING_SOURCES_AVAILABLE_TOPIC);
+    #endif
+
     // Fetch/Guess and report the charging state
     if (charging_state == 1 || charging_state == 2 || charging_state == 3) {
         client.publish(MQTT_STATUS_TOPIC, "Charging");
@@ -239,7 +249,7 @@ void sendInfoRoomba() {
         roomba_halted = false;
         roomba_spot_cleaning = false;
         roomba_max_cleaning = false;
-    } else if (nBatPcent == 100) {
+    } else if (charging_sources_available > 0) {
         client.publish(MQTT_STATUS_TOPIC, "Charging");
         charging = true;
     } else {
