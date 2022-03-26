@@ -80,6 +80,7 @@ bool roomba_cleaning;
 bool roomba_returning;
 bool roomba_halted;
 bool charging;
+bool roomba_spot_cleaning;
 //////////////////////////////////////////////////////////////////////////// Time
 WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP, "pool.ntp.org", UTC_OFFSET);
@@ -152,6 +153,9 @@ void callback(char* topic, byte* payload, unsigned int length) {
         }
         if (newPayload == "restartRoomba") {
             restartRoomba();
+        }
+        if (newPayload == "spot") {
+            startSpotCleaning();
         }
     }
 }
@@ -229,7 +233,8 @@ void sendInfoRoomba() {
         roomba_cleaning = false;
         roomba_returning = false;
         roomba_halted = false;
-    } else if (nBatPcent > 97 && !roomba_running) {
+        roomba_spot_cleaning = false;
+    } else if (nBatPcent == 100) {
         client.publish(MQTT_STATUS_TOPIC, "Charging");
         charging = true;
     } else {
@@ -321,26 +326,36 @@ void roombaCommandedStatus(int status) {
             roomba_cleaning = true;
             roomba_returning = false;
             roomba_halted = false;
+            roomba_spot_cleaning = false;
             client.publish(MQTT_STATUS_TOPIC, "Cleaning");
             break;
         case 2:
             roomba_cleaning = false;
             roomba_returning = true;
             roomba_halted = false;
+            roomba_spot_cleaning = false;
             client.publish(MQTT_STATUS_TOPIC, "Returning");
             break;
         case 3:
             roomba_cleaning = false;
             roomba_returning = false;
             roomba_halted = true;
+            roomba_spot_cleaning = false;
             client.publish(MQTT_STATUS_TOPIC, "Halted");
+            break;
+        case 4:
+            roomba_cleaning = false;
+            roomba_returning = false;
+            roomba_halted = false;
+            roomba_spot_cleaning = true;
+            client.publish(MQTT_STATUS_TOPIC, "Spot Cleaning");
             break;
     }
 }
 
 // Guess the Roomba's current status
 void roombaStatus() {
-    if (roomba_running && !roomba_cleaning && !roomba_returning) {
+    if (roomba_running && !roomba_cleaning && !roomba_returning && !roomba_spot_cleaning) {
         roombaCommandedStatus(1);
     } else if (roomba_running && roomba_cleaning) {
         roombaCommandedStatus(1);
@@ -348,6 +363,8 @@ void roombaStatus() {
         roombaCommandedStatus(2);
     } else if (!roomba_running && !charging) {
         roombaCommandedStatus(3);
+    } else if (roomba_running && roomba_spot_cleaning) {
+        roombaCommandedStatus(4);
     }
 }
 
@@ -398,6 +415,20 @@ void returnToDock() {
     Serial.write(143);
     delay(50);
     roombaCommandedStatus(2);
+}
+
+// Start spot cleaning
+void startSpotCleaning() {
+    awake();
+    awakeFromDeepSleep();
+    delay(50);
+    Serial.write(128);
+    delay(50);
+    Serial.write(131);
+    delay(50);
+    Serial.write(134);
+    delay(50);
+    roombaCommandedStatus(4);
 }
 
 // Set the Roomba's clock
