@@ -82,9 +82,6 @@ bool roomba_halted;
 bool charging;
 bool roomba_spot_cleaning;
 bool roomba_max_cleaning;
-//////////////////////////////////////////////////////////////////////////// Time
-WiFiUDP ntpUDP;
-NTPClient timeClient(ntpUDP, "pool.ntp.org", UTC_OFFSET);
 //////////////////////////////////////////////////////////////////////////// Functions
 
 // Configure the WiFi interface
@@ -477,6 +474,21 @@ void startMaxCleaning() {
 
 // Set the Roomba's clock
 void setTimeAndDate() {
+    int utc_offset;
+    #if DST
+    utc_offset = UTC_OFFSET + 3600;
+    #else
+    utc_offset = UTC_OFFSET;
+    #endif
+
+    WiFiUDP ntpUDP;
+    NTPClient timeClient(ntpUDP, "pool.ntp.org", utc_offset);
+
+    timeClient.begin();
+    delay(1000);
+    timeClient.update();
+    delay(1000);
+
     awake();
     awakeFromDeepSleep();
     delay(50);
@@ -550,17 +562,10 @@ void setup() {
     ArduinoOTA.begin();
 
     // Time
-    timeClient.begin();
-    delay(1000);
-    timeClient.update();
-    delay(1000);
     setTimeAndDate();
 }
 
 void loop() {
-    // Time
-    timeClient.update();
-
     // OTA Updates
     ArduinoOTA.handle();
 

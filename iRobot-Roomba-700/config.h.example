@@ -25,6 +25,7 @@
 
 // Clock
 #define UTC_OFFSET 0 // In seconds
+#define DST false // Daylight saving time
 
 // MQTT
 #define MQTT_SERVER ""
