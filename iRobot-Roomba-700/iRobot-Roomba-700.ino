@@ -161,6 +161,9 @@ void callback(char* topic, byte* payload, unsigned int length) {
         if (newPayload == "max") {
             startMaxCleaning();
         }
+        if (newPayload == "powerOffRoomba") {
+            powerOffRoomba();
+        }
     }
 }
 
@@ -509,6 +512,18 @@ void restartRoomba() {
     Serial.write(131);
     delay(50);
     Serial.write(7);
+}
+
+// Power off the Roomba
+void powerOffRoomba() {
+    awake();
+    awakeFromDeepSleep();
+    delay(50);
+    Serial.write(128);
+    delay(50);
+    Serial.write(131);
+    delay(50);
+    Serial.write(133);
 }
 
 void setup() {
