@@ -17,6 +17,21 @@ Smartify your iRobot using an ESP-01S
 - Ability to power off the `iRobot`
 - Can be hooked into Home Assistant using only a `Template Vacuum` configuration
 
+# Software Requirements
+- Arduino IDE
+- MQTT Broker
+
+# Hardware Requirements
+- iRobot Roomba 700 series
+- A WiFi network
+- ESP-01S
+- FTDI Flasher
+- Buck Converter (set it to `3.3v`)
+- `2N3906` PNP Transistor
+
+# Connection Diagram
+![Connection Diagram](https://github.com/ShonP40/iRobot-Roomba-700/blob/master/connection-diagram.jpg)
+
 # Credits
 [thehookup](https://github.com/thehookup) - Original idea and [implementation](https://github.com/thehookup/MQTT-Roomba-ESP01)
 
