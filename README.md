@@ -8,7 +8,7 @@ Smartify your iRobot using an ESP-01S
 - Communicates over MQTT
 - Ability to reconnect to WiFi & MQTT
 - Ability to wake the iRobot up from normal & deep sleep
-- Ability to command the iRobot to start normal/spot cleaning / stop cleaning and go back to the dock
+- Ability to command the iRobot to start normal/spot/max cleaning / stop cleaning and go back to the dock
 - Ability to set the iRobot's clock (automatically and manually using an MQTT command)
 - Get a detailed charging status from the iRobot (if the `DEBUG` option is set to `true`)
 - Ability to guess the iRobot's status (the [`Roomba Open Interface (OI)`](https://www.irobotweb.com/-/media/MainSite/PDFs/About/STEM/Create/iRobot_Roomba_600_Open_Interface_Spec.pdf) doesn't report cleaning status)
