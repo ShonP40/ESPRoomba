@@ -236,7 +236,11 @@ void sendInfoRoomba() {
     roomba.getSensors(34, tempBuf, 1);
     charging_sources_available = tempBuf[0];
     #if SENSORS
-    packageAndSendMQTT(String(charging_sources_available), MQTT_CHARGING_SOURCES_AVAILABLE_TOPIC);
+    if (charging_sources_available > 0) {
+        packageAndSendMQTT("Dock", MQTT_CHARGING_SOURCES_AVAILABLE_TOPIC);
+    } else {
+        packageAndSendMQTT("None", MQTT_CHARGING_SOURCES_AVAILABLE_TOPIC);
+    }
     #endif
 
     // Fetch/Guess and report the charging state
