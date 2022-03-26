@@ -310,7 +310,7 @@ void sendInfoRoomba() {
     roomba.getSensors(57, tempBuf, 2);
     side_brush_motor_current = tempBuf[1] + 256 * tempBuf[0];
     #if SENSORS
-    packageAndSendMQTT(String(side_brush_motor_current), MQTT_SIDE_BRUH_MOTOR_CURRENT_TOPIC);
+    packageAndSendMQTT(String(side_brush_motor_current), MQTT_SIDE_BRUSH_MOTOR_CURRENT_TOPIC);
     #endif
 
     // Running indicator
