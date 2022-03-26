@@ -413,6 +413,8 @@ void startCleaning() {
     awake();
     awakeFromDeepSleep();
     delay(50);
+    stopCleaning();
+    delay(50);
     Serial.write(128);
     delay(50);
     Serial.write(131);
@@ -426,6 +428,8 @@ void startCleaning() {
 void returnToDock() {
     awake();
     awakeFromDeepSleep();
+    delay(50);
+    stopCleaning();
     delay(50);
     Serial.write(128);
     delay(50);
@@ -441,6 +445,8 @@ void startSpotCleaning() {
     awake();
     awakeFromDeepSleep();
     delay(50);
+    stopCleaning();
+    delay(50);
     Serial.write(128);
     delay(50);
     Serial.write(131);
@@ -454,6 +460,8 @@ void startSpotCleaning() {
 void startMaxCleaning() {
     awake();
     awakeFromDeepSleep();
+    delay(50);
+    stopCleaning();
     delay(50);
     Serial.write(128);
     delay(50);
