@@ -300,8 +300,8 @@ void sendInfoRoomba() {
     packageAndSendMQTT(String(side_brush_motor_current), MQTT_SIDE_BRUH_MOTOR_CURRENT_TOPIC);
     #endif
 
-    // Power indicator
-    if (right_motor_current + left_motor_current + main_brush_motor_current + side_brush_motor_current > 0) {
+    // Running indicator
+    if ((right_motor_current + left_motor_current + main_brush_motor_current + side_brush_motor_current > 0) && !charging) {
         #if DEBUG
         client.publish(MQTT_RUNNING_INDICATOR_TOPIC, "Running");
         #endif
