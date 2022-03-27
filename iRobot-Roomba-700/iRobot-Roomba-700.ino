@@ -85,6 +85,9 @@ bool roomba_max_cleaning;
 
 // Charging Sources Available
 long charging_sources_available = 0;
+
+// Roomba buttons
+String roomba_buttons;
 //////////////////////////////////////////////////////////////////////////// Functions
 
 // Configure the WiFi interface
@@ -336,6 +339,29 @@ void sendInfoRoomba() {
         #endif
         roomba_running = false;
     }
+
+    // Buttons
+    roomba.getSensors(18, tempBuf, 1);
+    switch (tempBuf[0]) {
+        case 0:
+            roomba_buttons = "None";
+            break;
+        case 1:
+            roomba_buttons = "Clean";
+            roombaCommandedStatus(1);
+            break;
+        case 2:
+            roomba_buttons = "Spot";
+            roombaCommandedStatus(4);
+            break;
+        case 4:
+            roomba_buttons = "Dock";
+            roombaCommandedStatus(2);
+            break;
+    }
+    #if SENSORS
+    packageAndSendMQTT(roomba_buttons, MQTT_ROOMBA_BUTTONS_TOPIC);
+    #endif
 }
 
 // Set the commanded state and report to MQTT
@@ -347,6 +373,7 @@ void roombaCommandedStatus(int status) {
             roomba_halted = false;
             roomba_spot_cleaning = false;
             roomba_max_cleaning = false;
+            roomba_running = true;
             client.publish(MQTT_STATUS_TOPIC, "Cleaning");
             break;
         case 2:
@@ -355,6 +382,7 @@ void roombaCommandedStatus(int status) {
             roomba_halted = false;
             roomba_spot_cleaning = false;
             roomba_max_cleaning = false;
+            roomba_running = true;
             client.publish(MQTT_STATUS_TOPIC, "Returning");
             break;
         case 3:
@@ -363,6 +391,7 @@ void roombaCommandedStatus(int status) {
             roomba_halted = true;
             roomba_spot_cleaning = false;
             roomba_max_cleaning = false;
+            roomba_running = false;
             client.publish(MQTT_STATUS_TOPIC, "Halted");
             break;
         case 4:
@@ -371,6 +400,7 @@ void roombaCommandedStatus(int status) {
             roomba_halted = false;
             roomba_spot_cleaning = true;
             roomba_max_cleaning = false;
+            roomba_running = true;
             client.publish(MQTT_STATUS_TOPIC, "Spot Cleaning");
             break;
         case 5:
@@ -379,6 +409,7 @@ void roombaCommandedStatus(int status) {
             roomba_halted = false;
             roomba_spot_cleaning = false;
             roomba_max_cleaning = true;
+            roomba_running = true;
             client.publish(MQTT_STATUS_TOPIC, "Max Cleaning");
             break;
     }
