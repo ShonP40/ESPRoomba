@@ -453,8 +453,8 @@ void stopCleaning() {
     roombaCommandedStatus(3);
 }
 
-// Start cleaning
-void startCleaning() {
+// These actions are being used for most of the Roomba's commands
+void commonCommandActions() {
     awake();
     awakeFromDeepSleep();
     delay(50);
@@ -464,6 +464,11 @@ void startCleaning() {
     delay(50);
     Serial.write(131);
     delay(50);
+}
+
+// Start cleaning
+void startCleaning() {
+    commonCommandActions();
     Serial.write(135);
     delay(50);
     roombaCommandedStatus(1);
@@ -471,15 +476,7 @@ void startCleaning() {
 
 // Return to the dock
 void returnToDock() {
-    awake();
-    awakeFromDeepSleep();
-    delay(50);
-    stopCleaning();
-    delay(50);
-    Serial.write(128);
-    delay(50);
-    Serial.write(131);
-    delay(50);
+    commonCommandActions();
     Serial.write(143);
     delay(50);
     roombaCommandedStatus(2);
@@ -487,15 +484,7 @@ void returnToDock() {
 
 // Start spot cleaning
 void startSpotCleaning() {
-    awake();
-    awakeFromDeepSleep();
-    delay(50);
-    stopCleaning();
-    delay(50);
-    Serial.write(128);
-    delay(50);
-    Serial.write(131);
-    delay(50);
+    commonCommandActions();
     Serial.write(134);
     delay(50);
     roombaCommandedStatus(4);
@@ -503,15 +492,7 @@ void startSpotCleaning() {
 
 // Start max cleaning
 void startMaxCleaning() {
-    awake();
-    awakeFromDeepSleep();
-    delay(50);
-    stopCleaning();
-    delay(50);
-    Serial.write(128);
-    delay(50);
-    Serial.write(131);
-    delay(50);
+    commonCommandActions();
     Serial.write(136);
     delay(50);
     roombaCommandedStatus(5);
@@ -561,11 +542,7 @@ void setTimeAndDate() {
 
 // Restart the Roomba (same as removing the battery)
 void restartRoomba() {
-    awake();
-    awakeFromDeepSleep();
-    delay(50);
-    Serial.write(128);
-    delay(50);
+    commonCommandActions();
     Serial.write(131);
     delay(50);
     Serial.write(7);
@@ -573,12 +550,7 @@ void restartRoomba() {
 
 // Power off the Roomba
 void powerOffRoomba() {
-    awake();
-    awakeFromDeepSleep();
-    delay(50);
-    Serial.write(128);
-    delay(50);
-    Serial.write(131);
+    commonCommandActions();
     delay(50);
     Serial.write(133);
 }
