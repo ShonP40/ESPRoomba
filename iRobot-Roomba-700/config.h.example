@@ -13,11 +13,13 @@
 // Static routing
 #define STATIC_IP false
 
+#if STATIC_IP
 #define LOCAL_IP 0, 0, 0, 0;
 #define GATEWAY 0, 0, 0, 0;
 #define SUBNET 0, 0, 0, 0;
 #define PRIMARYDNS 0, 0, 0, 0;
 #define SECONDARYDNS 0, 0, 0, 0;
+#endif
 
 // OTA
 #define OTA_PASSWORD ""
