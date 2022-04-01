@@ -7,7 +7,7 @@ Smartify your iRobot® using an ESP-01S
 - Ability to connect to a specific router using its `BSSID` (useful on a mesh network)
 - OTA Updates
 - Communicates over MQTT
-- Ability to reconnect to WiFi & MQTT
+- Ability to automatically reconnect to WiFi & MQTT
 - Ability to wake the iRobot® up from normal & deep sleep
 - Ability to command the iRobot® to start normal/spot/max cleaning / stop cleaning and go back to the dock
 - Ability to set the iRobot®'s clock (automatically and manually using an MQTT command) with DST support (Needs to be enabled in the config)
