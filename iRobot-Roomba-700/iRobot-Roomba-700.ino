@@ -75,7 +75,7 @@ void setup_wifi() {
     uint8_t bssid[6];
     char* ptr;
     bssid[0] = strtol(WIFI_BSSID, &ptr, HEX);
-    for (uint8_t i = 1; i < 6; i++ ) {
+    for (uint8_t i = 1; i < 6; i++) {
         bssid[i] = strtol(ptr+1, &ptr, HEX);
     }
     WiFi.begin(WIFI_SSID, WIFI_PASSWORD, 0, bssid);
