@@ -4,6 +4,7 @@ Smartify your iRobot® using an ESP-01S
 # Features
 - Detailed user config file (rename `config.h.example` to `config.h`)
 - `DHCP` and `Static IP` support
+- Ability to connect to a specific router using its `BSSID` (useful on a mesh network)
 - OTA Updates
 - Communicates over MQTT
 - Ability to reconnect to WiFi & MQTT
