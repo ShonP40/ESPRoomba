@@ -8,31 +8,6 @@
 #include <string.h>
 // Your config file
 #include "config.h"
-
-//////////////////////////////////////////////////////////////////////////// Main configuration
-// WiFi
-const char* ssid = WIFI_SSID;
-const char* password = WIFI_PASSWORD;
-
-// Static routing
-#if STATIC_IP
-IPAddress local_IP(LOCAL_IP);
-IPAddress gateway(GATEWAY);
-IPAddress subnet(SUBNET);
-IPAddress primaryDNS(PRIMARYDNS);
-IPAddress secondaryDNS(SECONDARYDNS);
-#endif
-
-// OTA
-const char* OTApassword = OTA_PASSWORD;
-const int OTAport = OTA_PORT;
-
-// MQTT
-const char* mqtt_server = MQTT_SERVER;
-const int mqtt_port = MQTT_PORT;
-const char* mqtt_user = MQTT_USER;
-const char* mqtt_pass = MQTT_PASS;
-const char* mqtt_client_name = MQTT_CLIENT_NAME;
 //////////////////////////////////////////////////////////////////////////// Prepare the ESP
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -93,10 +68,10 @@ String roomba_buttons;
 // Configure the WiFi interface
 void setup_wifi() {
     #if STATIC_IP
-    WiFi.config(local_IP, gateway, subnet, primaryDNS, secondaryDNS);
+    WiFi.config(IPAddress(LOCAL_IP), IPAddress(GATEWAY), IPAddress(SUBNET), IPAddress(PRIMARYDNS), IPAddress(SECONDARYDNS));
     #endif
-    WiFi.hostname(mqtt_client_name);
-    WiFi.begin(ssid, password);
+    WiFi.hostname(MQTT_CLIENT_NAME);
+    WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
     while (WiFi.status() != WL_CONNECTED) {
         delay(500);
     }
@@ -109,7 +84,7 @@ void reconnect() {
     while (!client.connected()) {
         if (retries < 50) {
             // Attempt to connect
-            if (client.connect(mqtt_client_name, mqtt_user, mqtt_pass, MQTT_STATUS_TOPIC, 0, 0, "Dead Somewhere")) {
+            if (client.connect(MQTT_CLIENT_NAME, MQTT_USER, MQTT_PASS, MQTT_STATUS_TOPIC, 0, 0, "Dead Somewhere")) {
                 #if DEBUG
                 // Once connected, publish an announcement...
                 if (boot == false) {
@@ -569,13 +544,13 @@ void setup() {
     setup_wifi();
 
     //MQTT
-    client.setServer(mqtt_server, mqtt_port);
+    client.setServer(MQTT_SERVER, MQTT_PORT);
     client.setCallback(callback);
 
     // OTA
-    ArduinoOTA.setPort(OTAport);
-    ArduinoOTA.setHostname(mqtt_client_name);
-    ArduinoOTA.setPassword((const char *)OTApassword);
+    ArduinoOTA.setPort(OTA_PORT);
+    ArduinoOTA.setHostname(MQTT_CLIENT_NAME);
+    ArduinoOTA.setPassword((const char *)OTA_PASSWORD);
     ArduinoOTA.begin();
 
     // Time
