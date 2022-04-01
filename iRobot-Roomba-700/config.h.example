@@ -7,6 +7,11 @@
 #define SENSORS false
 
 // WiFi
+#define USE_BSSID false
+
+#if USE_BSSID
+#define WIFI_BSSID "00:00:00:00:00:00"
+#endif
 #define WIFI_SSID ""
 #define WIFI_PASSWORD ""
 

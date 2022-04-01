@@ -71,7 +71,17 @@ void setup_wifi() {
     WiFi.config(IPAddress(LOCAL_IP), IPAddress(GATEWAY), IPAddress(SUBNET), IPAddress(PRIMARYDNS), IPAddress(SECONDARYDNS));
     #endif
     WiFi.hostname(MQTT_CLIENT_NAME);
+    #if USE_BSSID
+    uint8_t bssid[6];
+    char* ptr;
+    bssid[0] = strtol(WIFI_BSSID, &ptr, HEX);
+    for (uint8_t i = 1; i < 6; i++ ) {
+        bssid[i] = strtol(ptr+1, &ptr, HEX);
+    }
+    WiFi.begin(WIFI_SSID, WIFI_PASSWORD, 0, bssid);
+    #else
     WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+    #endif
     while (WiFi.status() != WL_CONNECTED) {
         delay(500);
     }
@@ -529,6 +539,8 @@ void powerOffRoomba() {
     delay(50);
     Serial.write(133);
 }
+
+//////////////////////////////////////////////////////////////////////////// Main
 
 void setup() {
     // Configure the serial interface
