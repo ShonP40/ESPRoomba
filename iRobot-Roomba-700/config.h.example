@@ -64,5 +64,5 @@
 #define MQTT_MAIN_BRUSH_MOTOR_CURRENT_TOPIC "roomba/main-brush-motor-current"
 #define MQTT_SIDE_BRUSH_MOTOR_CURRENT_TOPIC "roomba/side-brush-motor-current"
 #define MQTT_CHARGING_SOURCES_AVAILABLE_TOPIC "roomba/charging-sources-available"
-#define MQTT_ROOMBA_BUTTONS_TOPIC "roomba/roomba-buttons"
+#define MQTT_ROOMBA_BUTTONS_TOPIC "roomba/buttons"
 #endif
