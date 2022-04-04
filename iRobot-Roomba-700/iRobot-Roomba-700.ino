@@ -70,7 +70,9 @@ void setup_wifi() {
     #if STATIC_IP
     WiFi.config(IPAddress(LOCAL_IP), IPAddress(GATEWAY), IPAddress(SUBNET), IPAddress(PRIMARYDNS), IPAddress(SECONDARYDNS));
     #endif
+
     WiFi.hostname(MQTT_CLIENT_NAME);
+
     #if USE_BSSID
     uint8_t bssid[6];
     char* ptr;
@@ -82,6 +84,7 @@ void setup_wifi() {
     #else
     WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
     #endif
+
     while (WiFi.status() != WL_CONNECTED) {
         delay(500);
     }
@@ -559,7 +562,7 @@ void setup() {
     client.setServer(MQTT_SERVER, MQTT_PORT);
     client.setCallback(callback);
 
-    // OTA
+    // OTA Updates
     ArduinoOTA.setPort(OTA_PORT);
     ArduinoOTA.setHostname(MQTT_CLIENT_NAME);
     ArduinoOTA.setPassword((const char *)OTA_PASSWORD);
