@@ -10,10 +10,11 @@ Smartify your iRobot® using an ESP-01S
 - Ability to automatically reconnect to WiFi & MQTT
 - Ability to wake the iRobot® up from normal & deep sleep
 - Ability to command the iRobot® to start normal/spot/max cleaning / stop cleaning and go back to the dock
-- Ability to set the iRobot®'s clock (automatically and manually using an MQTT command) with DST support (Needs to be enabled in the config)
+- Ability to set the iRobot®'s clock (automatically (on every restart or every 24 hours) and manually using an MQTT command) with DST support (Needs to be enabled in the config)
 - Get a detailed charging status from the iRobot (if the `DEBUG` option is set to `true`)
 - Ability to guess the iRobot®'s status (the [`Roomba® Open Interface (OI)`](https://www.irobotweb.com/-/media/MainSite/PDFs/About/STEM/Create/iRobot_Roomba_600_Open_Interface_Spec.pdf) doesn't report cleaning status)
 - Ability to report more advanced sensors (Battery temperature & voltage, General power usage, Motor currents, the value of the Virtual Wall sensor and which button is being pressed) (if the `SENSORS` option is set to `true`)
+- Ability to report the full WiFi status (SSID, BSSID, Channel, RSSI and IP) (if the `WIFI_DEBUG` option is set to `true`)
 - Ability to restart the `ESP` and the `iRobot®`
 - Ability to power off the `iRobot®`
 - Can be hooked into Home Assistant using only a `Template Vacuum` configuration
