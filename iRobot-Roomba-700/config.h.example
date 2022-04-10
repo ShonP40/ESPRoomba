@@ -7,6 +7,8 @@
 #define SENSORS false
 
 // WiFi
+#define WIFI_DEBUG false
+
 #define USE_BSSID false
 
 #if USE_BSSID
@@ -65,4 +67,12 @@
 #define MQTT_SIDE_BRUSH_MOTOR_CURRENT_TOPIC "roomba/side-brush-motor-current"
 #define MQTT_CHARGING_SOURCES_AVAILABLE_TOPIC "roomba/charging-sources-available"
 #define MQTT_ROOMBA_BUTTONS_TOPIC "roomba/buttons"
+#endif
+
+#if WIFI_DEBUG
+#define MQTT_WIFI_SSID_TOPIC "roomba/wifi-ssid"
+#define MQTT_WIFI_BSSID_TOPIC "roomba/wifi-bssid"
+#define MQTT_WIFI_CHANNEL_TOPIC "roomba/wifi-channel"
+#define MQTT_WIFI_RSSI_TOPIC "roomba/wifi-rssi"
+#define MQTT_WIFI_IP_TOPIC "roomba/wifi-ip"
 #endif

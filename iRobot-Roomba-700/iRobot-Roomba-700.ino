@@ -88,6 +88,9 @@ void setup_wifi() {
     while (WiFi.status() != WL_CONNECTED) {
         delay(500);
     }
+
+    WiFi.setAutoReconnect(true);
+    WiFi.persistent(true);
 }
 
 // Reconnect to WiFi & MQTT
@@ -543,6 +546,28 @@ void powerOffRoomba() {
     Serial.write(133);
 }
 
+#if WIFI_DEBUG
+
+String ipToString(IPAddress ip){
+  String s="";
+  for (int i=0; i<4; i++)
+    s += i  ? "." + String(ip[i]) : String(ip[i]);
+  return s;
+}
+
+void wifiStatus() {
+    packageAndSendMQTT(WiFi.SSID(), MQTT_WIFI_SSID_TOPIC);
+
+    packageAndSendMQTT(WiFi.BSSIDstr(), MQTT_WIFI_BSSID_TOPIC);
+
+    packageAndSendMQTT(String(WiFi.channel()), MQTT_WIFI_CHANNEL_TOPIC);
+
+    packageAndSendMQTT(String(WiFi.RSSI()), MQTT_WIFI_RSSI_TOPIC);
+
+    packageAndSendMQTT(ipToString(WiFi.localIP()), MQTT_WIFI_IP_TOPIC);
+}
+#endif
+
 //////////////////////////////////////////////////////////////////////////// Main
 
 void setup() {
@@ -579,6 +604,12 @@ void loop() {
     // Roomba info
     sendInfoRoomba();
     roombaStatus();
+
+    // ESP info
+    #if WIFI_DEBUG
+    wifiStatus();
+    #endif
+
     delay(1000);
 
     // MQTT
