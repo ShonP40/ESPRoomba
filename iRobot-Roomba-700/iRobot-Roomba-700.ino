@@ -22,6 +22,8 @@ bool boot = true;
 
 // MQTT
 char mqtt_send_package[50];
+char mqtt_send_topic[50];
+char mqtt_commands_topic[50];
 
 // Battery
 int nBatPcent;
@@ -93,6 +95,16 @@ void setup_wifi() {
     WiFi.persistent(true);
 }
 
+// Package up the provided data and send it to the MQTT broker
+void packageAndSendMQTT(String value, String topic) {
+    value.toCharArray(mqtt_send_package, value.length() + 1);
+    
+    String fullTopic = MQTT_CLIENT_NAME + (String)"/" + topic;
+    fullTopic.toCharArray(mqtt_send_topic, fullTopic.length() + 1);
+
+    client.publish(mqtt_send_topic, mqtt_send_package);
+}
+
 // Reconnect to WiFi & MQTT
 void reconnect() {
     // Loop until we're reconnected
@@ -100,19 +112,22 @@ void reconnect() {
     while (!client.connected()) {
         if (retries < 50) {
             // Attempt to connect
-            if (client.connect(MQTT_CLIENT_NAME, MQTT_USER, MQTT_PASS, MQTT_STATUS_TOPIC, 0, 0, "Dead Somewhere")) {
+            if (client.connect(MQTT_CLIENT_NAME, MQTT_USER, MQTT_PASS)) {
+                packageAndSendMQTT("Dead Somewhere", MQTT_STATUS_TOPIC);
                 #if DEBUG
                 // Once connected, publish an announcement...
                 if (boot == false) {
-                    client.publish(MQTT_BOOT_STATUS_TOPIC, "Reconnected");
+                    packageAndSendMQTT("Reconnected", MQTT_BOOT_STATUS_TOPIC);
                 }
                 if (boot == true) {
-                    client.publish(MQTT_BOOT_STATUS_TOPIC, "Rebooted");
+                    packageAndSendMQTT("Rebooted", MQTT_BOOT_STATUS_TOPIC);
                     boot = false;
                 }
                 #endif
                 // ... and resubscribe
-                client.subscribe(MQTT_COMMANDS_TOPIC);
+                String fullTopic = MQTT_CLIENT_NAME + (String)"/" + MQTT_COMMANDS_TOPIC;
+                fullTopic.toCharArray(mqtt_commands_topic, fullTopic.length() + 1);
+                client.subscribe(mqtt_commands_topic);
             } else {
                 retries++;
                 // Wait 5 seconds before retrying
@@ -130,7 +145,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
     String newTopic = topic;
     payload[length] = '\0';
     String newPayload = String((char *)payload);
-    if (newTopic == MQTT_COMMANDS_TOPIC) {
+    if (newTopic == MQTT_CLIENT_NAME + (String)"/" + MQTT_COMMANDS_TOPIC) {
         if (newPayload == "start") {
             startCleaning();
         }
@@ -172,12 +187,6 @@ void awake() {
     digitalWrite(noSleepPin, LOW);
 }
 
-// Package up the provided data and send it to the MQTT broker
-void packageAndSendMQTT(String value, char* topic) {
-    value.toCharArray(mqtt_send_package, value.length() + 1);
-    client.publish(topic, mqtt_send_package);
-}
-
 void sendInfoRoomba() {
     awake();
     roomba.start();
@@ -205,24 +214,24 @@ void sendInfoRoomba() {
     # if DEBUG
     // Get and report the advanced charging status
     switch (charging_state) {
-      case 0:
-        client.publish(MQTT_CHARGING_TOPIC, "Not Charging");
-        break;
-      case 1:
-        client.publish(MQTT_CHARGING_TOPIC, "Reconditioning Charging");
-        break;
-      case 2:
-        client.publish(MQTT_CHARGING_TOPIC, "Fast Charging");
-        break;
-      case 3:
-        client.publish(MQTT_CHARGING_TOPIC, "Trickle Charging");
-        break;
-      case 4:
-        client.publish(MQTT_CHARGING_TOPIC, "Waiting");
-        break;
-      case 5:
-        client.publish(MQTT_CHARGING_TOPIC, "Error");
-        break;
+        case 0:
+            packageAndSendMQTT("Not Charging", MQTT_CHARGING_TOPIC);
+            break;
+        case 1:
+            packageAndSendMQTT("Reconditioning Charging", MQTT_CHARGING_TOPIC);
+            break;
+        case 2:
+            packageAndSendMQTT("Fast Charging", MQTT_CHARGING_TOPIC);
+            break;
+        case 3:
+            packageAndSendMQTT("Trickle Charging", MQTT_CHARGING_TOPIC);
+            break;
+        case 4:
+            packageAndSendMQTT("Waiting", MQTT_CHARGING_TOPIC);
+            break;
+        case 5:
+            packageAndSendMQTT("Error", MQTT_CHARGING_TOPIC);
+            break;
     }
     #endif
 
@@ -239,7 +248,7 @@ void sendInfoRoomba() {
 
     // Fetch/Guess and report the charging state
     if (charging_state == 1 || charging_state == 2 || charging_state == 3) {
-        client.publish(MQTT_STATUS_TOPIC, "Charging");
+        packageAndSendMQTT("Charging", MQTT_STATUS_TOPIC);
         charging = true;
 
         roomba_cleaning = false;
@@ -248,7 +257,7 @@ void sendInfoRoomba() {
         roomba_spot_cleaning = false;
         roomba_max_cleaning = false;
     } else if (charging_sources_available > 0) {
-        client.publish(MQTT_STATUS_TOPIC, "Charging");
+        packageAndSendMQTT("Charging", MQTT_STATUS_TOPIC);
         charging = true;
     } else {
         charging = false;
@@ -266,9 +275,9 @@ void sendInfoRoomba() {
     virtual_wall = tempBuf[0];
 
     if (virtual_wall == 0) {
-        client.publish(MQTT_VIRTUAL_WALL_TOPIC, "Not Detected");
+        packageAndSendMQTT("Not Detected", MQTT_VIRTUAL_WALL_TOPIC);
     } else if (virtual_wall == 1) {
-        client.publish(MQTT_VIRTUAL_WALL_TOPIC, "Detected");
+        packageAndSendMQTT("Detected", MQTT_VIRTUAL_WALL_TOPIC);
     }
 
     // Battery voltage
@@ -321,12 +330,12 @@ void sendInfoRoomba() {
     // Running indicator
     if ((right_motor_current + left_motor_current + main_brush_motor_current + side_brush_motor_current > 0) && !charging) {
         #if DEBUG
-        client.publish(MQTT_RUNNING_INDICATOR_TOPIC, "Running");
+        packageAndSendMQTT("Running", MQTT_RUNNING_INDICATOR_TOPIC);
         #endif
         roomba_running = true;
     } else {
         #if DEBUG
-        client.publish(MQTT_RUNNING_INDICATOR_TOPIC, "Idle");
+        packageAndSendMQTT("Idle", MQTT_RUNNING_INDICATOR_TOPIC);
         #endif
         roomba_running = false;
     }
@@ -365,7 +374,7 @@ void roombaCommandedStatus(int status) {
             roomba_spot_cleaning = false;
             roomba_max_cleaning = false;
             roomba_running = true;
-            client.publish(MQTT_STATUS_TOPIC, "Cleaning");
+            packageAndSendMQTT("Cleaning", MQTT_STATUS_TOPIC);
             break;
         case 2:
             roomba_cleaning = false;
@@ -374,7 +383,7 @@ void roombaCommandedStatus(int status) {
             roomba_spot_cleaning = false;
             roomba_max_cleaning = false;
             roomba_running = true;
-            client.publish(MQTT_STATUS_TOPIC, "Returning");
+            packageAndSendMQTT("Returning", MQTT_STATUS_TOPIC);
             break;
         case 3:
             roomba_cleaning = false;
@@ -383,7 +392,7 @@ void roombaCommandedStatus(int status) {
             roomba_spot_cleaning = false;
             roomba_max_cleaning = false;
             roomba_running = false;
-            client.publish(MQTT_STATUS_TOPIC, "Halted");
+            packageAndSendMQTT("Halted", MQTT_STATUS_TOPIC);
             break;
         case 4:
             roomba_cleaning = false;
@@ -392,7 +401,7 @@ void roombaCommandedStatus(int status) {
             roomba_spot_cleaning = true;
             roomba_max_cleaning = false;
             roomba_running = true;
-            client.publish(MQTT_STATUS_TOPIC, "Spot Cleaning");
+            packageAndSendMQTT("Spot Cleaning", MQTT_STATUS_TOPIC);
             break;
         case 5:
             roomba_cleaning = false;
@@ -401,7 +410,7 @@ void roombaCommandedStatus(int status) {
             roomba_spot_cleaning = false;
             roomba_max_cleaning = true;
             roomba_running = true;
-            client.publish(MQTT_STATUS_TOPIC, "Max Cleaning");
+            packageAndSendMQTT("Max Cleaning", MQTT_STATUS_TOPIC);
             break;
     }
 }
