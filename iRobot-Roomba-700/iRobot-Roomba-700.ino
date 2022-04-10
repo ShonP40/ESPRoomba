@@ -547,11 +547,12 @@ void powerOffRoomba() {
 }
 
 #if WIFI_DEBUG
-String ipToString(IPAddress ip){
-  String s="";
-  for (int i=0; i<4; i++)
-    s += i  ? "." + String(ip[i]) : String(ip[i]);
-  return s;
+String ipToString(IPAddress ip) {
+    String s="";
+    for (int i=0; i<4; i++) {
+        s += i  ? "." + String(ip[i]) : String(ip[i]);
+    }
+    return s;
 }
 
 void wifiStatus() {
@@ -582,7 +583,7 @@ void setup() {
     // WiFi
     setup_wifi();
 
-    //MQTT
+    // MQTT
     client.setServer(MQTT_SERVER, MQTT_PORT);
     client.setCallback(callback);
 
@@ -620,7 +621,7 @@ void loop() {
     static uint32_t prevTime;
     uint32_t curTime = millis();
 
-    if (curTime - prevTime >= 24*60*60*1000UL) {
+    if (curTime - prevTime >= 24 * 60 * 60 * 1000UL) {
         prevTime = curTime;
 
         if (charging) {
