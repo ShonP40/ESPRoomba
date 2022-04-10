@@ -32,7 +32,7 @@ Smartify your iRobot® using an ESP-01S
 - `2N3906` PNP Transistor
 
 # Connection Diagram
-![Connection Diagram](https://github.com/ShonP40/iRobot-Roomba-700/blob/master/connection-diagram.jpg)
+![Connection Diagram](./connection-diagram.jpg)
 
 # Credits
 [thehookup](https://github.com/thehookup) - Original idea and [implementation](https://github.com/thehookup/MQTT-Roomba-ESP01)
