@@ -547,7 +547,6 @@ void powerOffRoomba() {
 }
 
 #if WIFI_DEBUG
-
 String ipToString(IPAddress ip){
   String s="";
   for (int i=0; i<4; i++)
