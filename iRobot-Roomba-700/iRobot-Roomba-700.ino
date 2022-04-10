@@ -616,5 +616,17 @@ void loop() {
         reconnect();
     }
 
+    // Runs every 24 hours
+    static uint32_t prevTime;
+    uint32_t curTime = millis();
+
+    if (curTime - prevTime >= 24*60*60*1000UL) {
+        prevTime = curTime;
+
+        if (charging) {
+            setTimeAndDate();
+        }
+    }
+
     client.loop();
 }
