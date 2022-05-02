@@ -27,6 +27,7 @@ char mqtt_commands_topic[50];
 
 // Battery
 int nBatPcent;
+int nBatPcentFinal;
 long battery_Current_mAh = 0;
 long charging_state = 0;
 long battery_Total_mAh = 0;
@@ -208,7 +209,14 @@ void sendInfoRoomba() {
     // Calculate battery percentage
     if (battery_Total_mAh != 0) {
         nBatPcent = 100 * battery_Current_mAh / battery_Total_mAh;
-        packageAndSendMQTT(String(nBatPcent), MQTT_BATTERY_TOPIC);
+        
+        if (nBatPcent >= 100) {
+            nBatPcentFinal = 100;
+        } else {
+            nBatPcentFinal = nBatPcent;
+        } 
+        
+        packageAndSendMQTT(String(nBatPcentFinal), MQTT_BATTERY_TOPIC);
     }
     
     # if DEBUG
