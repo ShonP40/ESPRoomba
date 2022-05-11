@@ -211,7 +211,7 @@ void sendInfoRoomba() {
         nBatPcent = 100 * battery_Current_mAh / battery_Total_mAh;
         
         if (nBatPcent > 100) {
-            nBatPcentFinal = 100;
+            nBatPcentFinal = 0;
         } else {
             nBatPcentFinal = nBatPcent;
         } 
