@@ -134,8 +134,7 @@ void reconnect() {
                 // Wait 5 seconds before retrying
                 delay(5000);
             }
-        }
-        if (retries >= 50) {
+        } else {
             ESP.restart();
         }
     }
