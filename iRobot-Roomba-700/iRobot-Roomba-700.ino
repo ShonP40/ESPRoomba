@@ -273,9 +273,11 @@ void sendInfoRoomba() {
     #if SENSORS
     // Battery temperature
     roomba.getSensors(24, tempBuf, 1);
-    battery_Temperature = tempBuf[0];
+    if (tempBuf[0] < 70) { // Don't report if getting a bad reading
+        battery_Temperature = tempBuf[0];
 
-    packageAndSendMQTT(String(battery_Temperature), MQTT_BATTERY_TEMPERATURE_TOPIC);
+        packageAndSendMQTT(String(battery_Temperature), MQTT_BATTERY_TEMPERATURE_TOPIC);
+    }
 
     // Virtual Wall
     roomba.getSensors(13, tempBuf, 1);
@@ -293,7 +295,9 @@ void sendInfoRoomba() {
 
     int nBatVolt = battery_voltage / 1000;
 
-    packageAndSendMQTT(String(nBatVolt), MQTT_BATTERY_VOLTAGE_TOPIC);
+    if (nBatVolt < 20) { // Don't report if getting a bad reading
+        packageAndSendMQTT(String(nBatVolt), MQTT_BATTERY_VOLTAGE_TOPIC);
+    }
 
     // Power usage
     roomba.getSensors(23, tempBuf, 2);
@@ -304,34 +308,50 @@ void sendInfoRoomba() {
     packageAndSendMQTT(String(nPwrUsage), MQTT_POWER_USAGE_TOPIC);
     #endif
 
-    // Motor current & Power indicator //
+    // Motor current
 
     // Right Motor
     roomba.getSensors(55, tempBuf, 2);
     right_motor_current = tempBuf[1] + 256 * tempBuf[0];
     #if SENSORS
-    packageAndSendMQTT(String(right_motor_current), MQTT_RIGHT_MOTOR_CURRENT_TOPIC);
+    if (!charging) {
+        packageAndSendMQTT(String(right_motor_current), MQTT_RIGHT_MOTOR_CURRENT_TOPIC);
+    } else {
+        packageAndSendMQTT("0", MQTT_RIGHT_MOTOR_CURRENT_TOPIC);
+    }
     #endif
 
     // Left Motor
     roomba.getSensors(54, tempBuf, 2);
     left_motor_current = tempBuf[1] + 256 * tempBuf[0];
     #if SENSORS
-    packageAndSendMQTT(String(left_motor_current), MQTT_LEFT_MOTOR_CURRENT_TOPIC);
+    if (!charging) {
+        packageAndSendMQTT(String(left_motor_current), MQTT_LEFT_MOTOR_CURRENT_TOPIC);
+    } else {
+        packageAndSendMQTT("0", MQTT_LEFT_MOTOR_CURRENT_TOPIC);
+    }
     #endif
 
     // Main Brush Motor
     roomba.getSensors(56, tempBuf, 2);
     main_brush_motor_current = tempBuf[1] + 256 * tempBuf[0];
     #if SENSORS
-    packageAndSendMQTT(String(main_brush_motor_current), MQTT_MAIN_BRUSH_MOTOR_CURRENT_TOPIC);
+    if (!charging) {
+        packageAndSendMQTT(String(main_brush_motor_current), MQTT_MAIN_BRUSH_MOTOR_CURRENT_TOPIC);
+    } else {
+        packageAndSendMQTT("0", MQTT_MAIN_BRUSH_MOTOR_CURRENT_TOPIC);
+    }
     #endif
 
     // Side Brush Motor
     roomba.getSensors(57, tempBuf, 2);
     side_brush_motor_current = tempBuf[1] + 256 * tempBuf[0];
     #if SENSORS
-    packageAndSendMQTT(String(side_brush_motor_current), MQTT_SIDE_BRUSH_MOTOR_CURRENT_TOPIC);
+    if (!charging) {
+        packageAndSendMQTT(String(side_brush_motor_current), MQTT_SIDE_BRUSH_MOTOR_CURRENT_TOPIC);
+    } else {
+        packageAndSendMQTT("0", MQTT_SIDE_BRUSH_MOTOR_CURRENT_TOPIC);
+    }
     #endif
 
     // Running indicator
