@@ -515,7 +515,7 @@ void setTimeAndDate() {
     #endif
 
     WiFiUDP ntpUDP;
-    NTPClient timeClient(ntpUDP, "pool.ntp.org", utc_offset);
+    NTPClient timeClient(ntpUDP, NTP, utc_offset);
 
     timeClient.begin();
     delay(1000);

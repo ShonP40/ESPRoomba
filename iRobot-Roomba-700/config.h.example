@@ -35,6 +35,7 @@
 // Clock
 #define UTC_OFFSET 0 // In seconds
 #define DST false // Daylight saving time
+#define NTP "pool.ntp.org" // NTP server
 
 // MQTT
 #define MQTT_SERVER ""
