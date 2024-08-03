@@ -1,4 +1,4 @@
-# iRobot® Roomba® 700
+# ESPRoomba
 Smartify your iRobot® using an ESP-01S
 
 # Features
@@ -24,12 +24,17 @@ Smartify your iRobot® using an ESP-01S
 - MQTT Broker
 
 # Hardware Requirements
-- iRobot® Roomba® 700 series
+- Compatible iRobot® Roomba®
 - A WiFi network
 - ESP-01S
 - FTDI Flasher
 - Buck Converter (set it to `3.3v`)
 - `2N3906` PNP Transistor
+
+# Tested iRobot® Roomba®'s
+- 600 series
+- 700 series
+- 800 series
 
 # Connection Diagram
 ![Connection Diagram](./connection-diagram.jpg)
