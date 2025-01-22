@@ -271,6 +271,7 @@ class RoombaComponent : public UARTDevice, public CustomAPIDevice, public Pollin
             SongCmd         = 140, //8C
             PlayCmd         = 141, //8D
             SensorsListCmd  = 149, //95
+			SetDateCmd		= 168,
         } Commands;      
             
 		void brc_wakeup() {
