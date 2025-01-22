@@ -6,180 +6,33 @@ vacuum:
         friendly_name: "iRobot"
         unique_id: irobot
         start:
-          service: mqtt.publish
-          data:
-            topic: roomba/commands
-            payload: start
+          action: button.press
+          target:
+            entity_id: button.irobot_clean
         stop:
-          service: mqtt.publish
-          data:
-            topic: roomba/commands
-            payload: stop
+          action: button.press
+          target:
+            entity_id: button.irobot_stop
         pause:
-          service: mqtt.publish
-          data:
-            topic: roomba/commands
-            payload: stop
+          action: button.press
+          target:
+            entity_id: button.irobot_stop
         return_to_base:
-          service: mqtt.publish
-          data:
-            topic: roomba/commands
-            payload: return_home
+          action: button.press
+          target:
+            entity_id: button.irobot_dock
         clean_spot:
-          service: mqtt.publish
-          data:
-            topic: roomba/commands
-            payload: spot
-        battery_level_template: "{{ states('sensor.roomba_battery')|int }}"
+          action: button.press
+          target:
+            entity_id: button.irobot_clean_spot
+        battery_level_template: "{{ states('sensor.irobot_irobot_battery')|int }}"
         value_template: >-
-          {% if states('sensor.roomba_status') == "Cleaning" %}
+          {% if states('sensor.irobot_irobot_activity') == "Cleaning" %}
             cleaning
-          {% elif states('sensor.roomba_status') == "Halted" %}
+          {% elif states('sensor.irobot_irobot_activity') == "Lost" %}
             paused
-          {% elif states('sensor.roomba_status') == "Returning" %}
-            returning
-          {% elif states('sensor.roomba_status') == "Dead Somewhere" %}
-            error
-          {% elif states('sensor.roomba_status') == "Charging" %}
+          {% elif states('sensor.irobot_irobot_activity') == "Docked" %}
             docked
-          {% elif states('sensor.roomba_status') == "Spot Cleaning" %}
-            cleaning
-          {% elif states('sensor.roomba_status') == "Max Cleaning" %}
-            cleaning
           {% else %}
             error
           {% endif %}
-
-mqtt:
-  button:
-    - name: "Roomba ESP Restart"
-      command_topic: "roomba/commands"
-      payload_press: "restartESP"
-      qos: 0
-      retain: false
-      entity_category: "diagnostic"
-      device_class: "restart"
-
-    - name: "Roomba Restart"
-      command_topic: "roomba/commands"
-      payload_press: "restartRoomba"
-      qos: 0
-      retain: false
-      entity_category: "diagnostic"
-      device_class: "restart"
-
-    - name: "Roomba Poweroff"
-      command_topic: "roomba/commands"
-      payload_press: "powerOffRoomba"
-      qos: 0
-      retain: false
-      entity_category: "diagnostic"
-      device_class: "restart"
-      icon: mdi:power
-
-    - name: "Roomba Max Cleaning"
-      command_topic: "roomba/commands"
-      payload_press: "max"
-      qos: 0
-      retain: false
-      icon: mdi:car-turbocharger
-
-  sensor:
-    - name: "Roomba Status"
-      state_topic: "roomba/status"
-
-    - name: "Roomba Battery"
-      state_topic: "roomba/battery"
-      unit_of_measurement: "%"
-      icon: mdi:battery
-
-    - name: "Roomba Battery Temperature"
-      state_topic: "roomba/battery-temperature"
-      unit_of_measurement: "°C"
-
-    - name: "Roomba Virtual Wall Detector"
-      state_topic: "roomba/virtual-wall"
-      icon: mdi:wall
-
-    - name: "Roomba Battery Voltage"
-      state_topic: "roomba/battery-voltage"
-      unit_of_measurement: "v"
-      icon: mdi:car-battery
-
-    - name: "Roomba Power Usage"
-      state_topic: "roomba/power-usage"
-      unit_of_measurement: "mA"
-      icon: mdi:transmission-tower
-
-    - name: "Roomba Boot Status"
-      state_topic: "roomba/boot-status"
-      icon: mdi:bootstrap
-
-    - name: "Roomba Charging Status"
-      state_topic: "roomba/charging"
-      icon: mdi:ev-station
-
-    - name: "Roomba Running Indicator"
-      state_topic: "roomba/running-indicator"
-      icon: mdi:run
-
-    - name: "Roomba Right Motor Current"
-      state_topic: "roomba/right-motor-current"
-      unit_of_measurement: "mA"
-      icon: mdi:engine-outline
-
-    - name: "Roomba Left Motor Current"
-      state_topic: "roomba/left-motor-current"
-      unit_of_measurement: "mA"
-      icon: mdi:engine-outline
-
-    - name: "Roomba Main Brush Motor Current"
-      state_topic: "roomba/main-brush-motor-current"
-      unit_of_measurement: "mA"
-      icon: mdi:fan
-
-    - name: "Roomba Side Brush Motor Current"
-      state_topic: "roomba/side-brush-motor-current"
-      unit_of_measurement: "mA"
-      icon: mdi:fan
-
-    - name: "Roomba Charging Sources Available"
-      state_topic: "roomba/charging-sources-available"
-      icon: mdi:power-socket
-
-    - name: "Roomba Pressed Button"
-      state_topic: "roomba/buttons"
-      icon: mdi:gesture-tap-button
-
-    - name: Roomba WiFi SSID
-      state_topic: "roomba/wifi-ssid"
-      icon: mdi:eye
-
-    - name: Roomba WiFi BSSID
-      state_topic: "roomba/wifi-bssid"
-      icon: mdi:eye
-
-    - name: Roomba WiFi Channel
-      state_topic: "roomba/wifi-channel"
-      icon: mdi:eye
-
-    - name: Roomba WiFi IP
-      state_topic: "roomba/wifi-ip"
-      icon: mdi:eye
-
-    - name: Roomba WiFi RSSI
-      state_topic: "roomba/wifi-rssi"
-      icon: mdi:wifi
-      unit_of_measurement: dBm
-
-    - name: Roomba Day
-      state_topic: "roomba/day"
-      icon: mdi:calendar
-
-    - name: Roomba Hour
-      state_topic: "roomba/hour"
-      icon: mdi:clock
-
-    - name: Roomba Minutes
-      state_topic: "roomba/minutes"
-      icon: mdi:clock

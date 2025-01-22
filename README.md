@@ -1,33 +1,23 @@
 # ESPRoomba
-Smartify your iRobot® using an ESP-01S
+Smartify your iRobot® using an ESP32-C3 running ESPHome
 
 # Features
-- Detailed user config file (rename `config.h.example` to `config.h`)
-- `DHCP` and `Static IP` support
-- Ability to connect to a specific router using its `BSSID` (useful on a mesh network)
-- OTA Updates
-- Communicates over MQTT
-- Ability to automatically reconnect to WiFi & MQTT
 - Ability to wake the iRobot® up from normal & deep sleep
-- Ability to command the iRobot® to start normal/spot/max cleaning / stop cleaning and go back to the dock
-- Ability to set the iRobot®'s clock (automatically (on every restart or every 24 hours) and manually using an MQTT command) with DST support (Needs to be enabled in the config)
-- Get a detailed charging status from the iRobot (if the `DEBUG` option is set to `true`)
+- Ability to command the iRobot® to start normal/spot/max cleaning/stop cleaning and go back to the dock
+- Get a detailed charging status from the iRobot
 - Ability to guess the iRobot®'s status (the [`Roomba® Open Interface (OI)`](./iRobot%20Roomba%20600%20Open%20Interface%20Spec.pdf) doesn't report cleaning status)
-- Ability to report more advanced sensors (Battery temperature & voltage, General power usage, Motor currents, the value of the Virtual Wall sensor and which button is being pressed) (if the `SENSORS` option is set to `true`)
-- Ability to report the full WiFi status (SSID, BSSID, Channel, RSSI and IP) (if the `WIFI_DEBUG` option is set to `true`)
-- Ability to restart the `ESP` and the `iRobot®`
-- Ability to power off the `iRobot®`
-- Can be hooked into Home Assistant using only a `Template Vacuum` configuration
+- Ability to report more advanced sensors (Battery temperature & voltage, General power usage and Motor currents)
+- Ability to restart and power off the `iRobot®`
+- Can be hooked into Home Assistant’s `Template Vacuum` configuration
 
 # Software Requirements
-- Arduino IDE
-- MQTT Broker
+- Home Assistant
+- ESPHome
 
 # Hardware Requirements
 - Compatible iRobot® Roomba®
 - A WiFi network
-- ESP-01S
-- FTDI Flasher
+- ESP32-C3 Super Mini
 - Buck Converter (set it to `3.3v`)
 - `2N3906` PNP Transistor
 
@@ -36,10 +26,11 @@ Smartify your iRobot® using an ESP-01S
 - 700 series
 - 800 series
 
-# Connection Diagram
-![Connection Diagram](./connection-diagram.jpg)
-
 # Credits
-[thehookup](https://github.com/thehookup) - Original idea and [implementation](https://github.com/thehookup/MQTT-Roomba-ESP01)
+[mannkind](https://github.com/mannkind) - [Original implementation](https://github.com/mannkind/ESPHomeRoombaComponent)
 
-[danielraq](https://github.com/danielraq) - Configuring the correct [normal wake up sequence](https://github.com/thehookup/MQTT-Roomba-ESP01/pull/3) for 700 series Roomba®s
+[davidecavestro](https://github.com/davidecavestro) - [Native API support and a major rewrite](https://github.com/davidecavestro/ESPHomeRoombaComponent)
+
+[wburgers](https://github.com/wburgers) - [Native UART support](https://github.com/wburgers/ESPHomeRoombaComponent)
+
+[philpownall](https://github.com/philpownall) - [Manual controls, text display and dashboard config](https://github.com/philpownall/ESPHomeRoomba)
