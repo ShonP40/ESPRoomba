@@ -260,6 +260,7 @@ class RoombaComponent : public UARTDevice, public CustomAPIDevice, public Pollin
             SafeCmd         = 131, //83
             FullCmd         = 132, //84
             CleanCmd        = 135, //87
+			MaxCleanCmd		= 136,
             SpotCmd         = 134, //86
             DockCmd         = 143, //8F
             PowerCmd        = 133, //85
@@ -291,6 +292,8 @@ class RoombaComponent : public UARTDevice, public CustomAPIDevice, public Pollin
 		void on_command(std::string command) {
 			if (command == "clean") {
 				clean();
+			} else if (command == "max_clean") {
+				maxClean();
 			} else if (command == "dock") {
                 displayString("DOCK");
 				dock();
@@ -476,6 +479,10 @@ class RoombaComponent : public UARTDevice, public CustomAPIDevice, public Pollin
 
 		void clean() {
 			write(CleanCmd);
+		}
+
+		void maxClean() {
+			write(MaxCleanCmd);
 		}
 
 		void dock() {
