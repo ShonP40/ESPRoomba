@@ -299,6 +299,8 @@ class RoombaComponent : public UARTDevice, public CustomAPIDevice, public Pollin
                 displayString("LOC ");
 			} else if (command == "clean_spot") {
 				spot();
+			} else if (command == "stop") {
+				stop();
 			} else if (command == "wakeup") {
 				brc_wakeup();
 			} else if (command == "wake_on_dock") {
@@ -482,6 +484,10 @@ class RoombaComponent : public UARTDevice, public CustomAPIDevice, public Pollin
 
 		void spot() {
 			write(SpotCmd);
+		}
+
+		void stop() {
+			write(StopCmd);
 		}
 
 		void sleep() {
