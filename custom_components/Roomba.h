@@ -80,7 +80,7 @@ class RoombaComponent : public UARTDevice, public CustomAPIDevice, public Pollin
 				SensorBatteryTemperature,
 				SensorOIMode,
 				SensorRightMotorCurrent,
-				SensorLeftMotorCurrent
+				SensorLeftMotorCurrent,
                 SensorMainBrushCurrent,
                 SensorSideBrushCurrent,
 			};
