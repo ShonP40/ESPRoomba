@@ -1,0 +1,351 @@
+substitutions:
+  name: "irobot"
+  friendly_name: "iRobot"
+  id: "irobot"
+  project_name: "ESP32C3.Super-Mini"
+  project_version: "1.0"
+  # BRC pin, uart_bus, polling interval in milliseconds, wake up 650+ series
+  init: 'RoombaComponent::instance(10, id(uart_bus), 10000, true);'
+
+esphome:
+  name: "${name}"
+  friendly_name: "${friendly_name}"
+  project:
+    name: "${project_name}"
+    version: "${project_version}"
+  includes:
+   - custom_components/Roomba.h
+
+esp32:
+  board: esp32-c3-devkitm-1
+  framework:
+    type: arduino
+
+# Enable logging
+logger:
+  level: INFO
+
+# Enable Home Assistant API
+api:
+
+preferences:
+  flash_write_interval: !secret flash_write_interval
+
+wifi:
+  networks:
+    ssid: !secret wifi_ssid
+    password: !secret wifi_password
+  fast_connect: true
+  ap:
+    ssid: ${friendly_name}
+    password: !secret wifi_password
+  power_save_mode: none
+
+captive_portal:
+
+ota:
+  platform: esphome
+
+web_server:
+  port: 80
+  version: 3
+
+status_led:
+  pin:
+    number: GPIO8
+    inverted: true
+
+uart:
+  id: uart_bus
+  tx_pin: 6
+  rx_pin: 7
+  baud_rate: 115200
+  # debug:
+  #   direction: RX
+
+# Enable startup debug info
+debug:
+
+custom_component:
+  - lambda: |-
+      auto r = ${init}
+      return {r};
+    id: my_roomba
+
+binary_sensor:
+  - platform: custom
+    lambda: |-
+        auto r = ${init}
+        return {r->vacuumSensor};
+    binary_sensors:
+      - name: "${name} vacuum state"
+        id: "${id}_vacuum"
+
+sensor:
+  - platform: wifi_signal
+    name: "${friendly_name} WiFi Signal"
+    update_interval: 60s
+  - platform: internal_temperature
+    name: "Internal Temperature"
+  - platform: custom
+    lambda: |-
+        auto r = ${init}
+        return {r->voltageSensor, r->currentSensor, r->batteryChargeSensor, r->batteryCapacitySensor, r->batteryPercentSensor, r->batteryTemperatureSensor, r->driveSpeedSensor, r->mainBrushCurrentSensor, r->sideBrushCurrentSensor};
+    sensors:
+      - name: "${name} voltage"
+        unit_of_measurement: "V"
+        icon: mdi:sine-wave
+        accuracy_decimals: 2
+      - name: "${name} current"
+        unit_of_measurement: "A"
+        icon: mdi:lightning-bolt
+        accuracy_decimals: 3
+      - name: "${name} charge"
+        unit_of_measurement: "Ah"
+        icon: mdi:battery-charging
+        accuracy_decimals: 2
+      - name: "${name} capacity"
+        unit_of_measurement: "Ah"
+        icon: mdi:battery
+        accuracy_decimals: 2
+      - name: "${name} battery"
+        unit_of_measurement: "%"
+        state_class: "measurement"
+        device_class: battery
+        icon: mdi:battery-outline
+        accuracy_decimals: 0
+      - name: "${name} temperature"
+        unit_of_measurement: "°C"
+        icon: mdi:thermometer
+        accuracy_decimals: 0
+      - name: "${name} drive speed"
+        unit_of_measurement: "mm/s"
+        accuracy_decimals: 0
+      - name: "${name} main brush current"
+        unit_of_measurement: "A"
+        icon: mdi:lightning-bolt
+        accuracy_decimals: 2
+      - name: "${name} side brush current"
+        unit_of_measurement: "A"
+        icon: mdi:lightning-bolt
+        accuracy_decimals: 2
+       
+text_sensor:
+  - platform: wifi_info
+    ip_address:
+      name: ${friendly_name} IP Address
+    ssid:
+      name: ${friendly_name} SSID
+    bssid:
+      name: ${friendly_name} BSSID
+    mac_address:
+      name: ${friendly_name} MAC Address
+  - platform: custom
+    lambda: |-
+      auto r = ${init}
+      return {r->chargingSensor, r->activitySensor, r->oiModeSensor};
+    text_sensors:
+      - name: "${name} charging state"
+      - name: "${name} activity"
+      - name: "${name} OI mode"
+        id: "${id}_oi_mode"
+
+button:
+  - platform: restart
+    id: restart_button
+    name: "${friendly_name} Restart"
+
+  - platform: template
+    name: Clean
+    id: clean
+    on_press:
+      then:
+        - lambda: |-
+            static_cast< RoombaComponent*> (id(my_roomba).get_component(0))->send_command("clean");
+
+  - platform: template
+    name: Max Clean
+    id: max_clean
+    on_press:
+      then:
+        - lambda: |-
+            static_cast< RoombaComponent*> (id(my_roomba).get_component(0))->send_command("max_clean");
+  
+  - platform: template
+    name: Dock
+    id: dock
+    on_press:
+      then:
+        - lambda: |-
+            static_cast< RoombaComponent*> (id(my_roomba).get_component(0))->send_command("dock");
+  
+  - platform: template
+    name: Stop
+    id: stop
+    on_press:
+      then:
+        - lambda: |-
+            static_cast< RoombaComponent*> (id(my_roomba).get_component(0))->send_command("stop");
+  
+  - platform: template
+    name: Wake Up
+    id: wakeup
+    on_press:
+      then:
+        - lambda: |-
+            static_cast< RoombaComponent*> (id(my_roomba).get_component(0))->send_command("wakeup");
+
+  - platform: template
+    name: Wake Up on Dock
+    id: wakeup_on_dock
+    on_press:
+      then:
+        - lambda: |-
+            static_cast< RoombaComponent*> (id(my_roomba).get_component(0))->send_command("wake_on_dock");
+  
+  - platform: template
+    name: Sleep
+    id: roomba_sleep
+    on_press:
+      then:
+        - lambda: |-
+            static_cast< RoombaComponent*> (id(my_roomba).get_component(0))->send_command("sleep");
+
+  - platform: template
+    name: Locate
+    id: locate
+    on_press:
+      then:
+        - lambda: |-
+            static_cast< RoombaComponent*> (id(my_roomba).get_component(0))->send_command("locate");
+  
+  - platform: template
+    name: Clean Spot
+    id: clean_spot
+    on_press:
+      then:
+        - lambda: |-
+            static_cast< RoombaComponent*> (id(my_roomba).get_component(0))->send_command("clean_spot");
+
+  - platform: template
+    name: Forward
+    id: go_forward
+    on_press:
+      then:
+        - lambda: |-
+            static_cast< RoombaComponent*> (id(my_roomba).get_component(0))->send_command("go_forward");
+  
+  - platform: template
+    name: Full Speed
+    id: go_max
+    on_press:
+      then:
+        - lambda: |-
+            static_cast< RoombaComponent*> (id(my_roomba).get_component(0))->send_command("go_max");
+  
+  - platform: template
+    name: Go Faster
+    id: go_faster
+    on_press:
+      then:
+        - lambda: |-
+            static_cast< RoombaComponent*> (id(my_roomba).get_component(0))->send_command("go_faster");
+
+  - platform: template
+    name: Go Slower
+    id: go_slower
+    on_press:
+      then:
+        - lambda: |-
+            static_cast< RoombaComponent*> (id(my_roomba).get_component(0))->send_command("go_slower");
+
+  - platform: template
+    name: Turn Left
+    id: go_left
+    on_press:
+      then:
+        - lambda: |-
+            static_cast< RoombaComponent*> (id(my_roomba).get_component(0))->send_command("go_left");
+
+  - platform: template
+    name: Turn Right
+    id: go_right
+    on_press:
+      then:
+        - lambda: |-
+            static_cast< RoombaComponent*> (id(my_roomba).get_component(0))->send_command("go_right");
+
+  - platform: template
+    name: Stop Driving
+    id: stop_driving
+    on_press:
+      then:
+        - lambda: |-
+            static_cast< RoombaComponent*> (id(my_roomba).get_component(0))->send_command("stop_driving");
+
+  - platform: template
+    name: Reverse
+    id: go_reverse
+    on_press:
+      then:
+        - lambda: |-
+            static_cast< RoombaComponent*> (id(my_roomba).get_component(0))->send_command("go_reverse");
+
+  - platform: template
+    name: Rotate Left
+    id: rotate_left
+    on_press:
+      then:
+        - lambda: |-
+            static_cast< RoombaComponent*> (id(my_roomba).get_component(0))->send_command("rotate_left");
+
+  - platform: template
+    name: Rotate Right
+    id: rotate_right
+    on_press:
+      then:
+        - lambda: |-
+            static_cast< RoombaComponent*> (id(my_roomba).get_component(0))->send_command("rotate_right");
+  
+  - platform: template
+    name: Restart Roomba
+    id: restart_roomba
+    on_press:
+      then:
+        - lambda: |-
+            static_cast< RoombaComponent*> (id(my_roomba).get_component(0))->send_command("reset");
+  
+  - platform: template
+    name: Poweroff Roomba
+    id: poweroff_roomba
+    on_press:
+      then:
+        - lambda: |-
+            static_cast< RoombaComponent*> (id(my_roomba).get_component(0))->send_command("poweroff");
+
+switch:
+  - platform: template
+    name: "${friendly_name} Vacuum"
+    lambda: |-
+      return id(${id}_vacuum).state;
+    turn_on_action:
+      - lambda: |-
+            static_cast< RoombaComponent*> (id(my_roomba).get_component(0))->send_command("vacuum_on");
+    turn_off_action:
+      - lambda: |-
+            static_cast< RoombaComponent*> (id(my_roomba).get_component(0))->send_command("vacuum_off");
+  
+  - platform: template
+    name: "${friendly_name} Safe Mode"
+    lambda: |-
+      if (id(${id}_oi_mode).state == "safe") {
+        return true;
+      } else {
+        return false;
+      }
+    turn_on_action:
+      - lambda: |-
+            static_cast< RoombaComponent*> (id(my_roomba).get_component(0))->send_command("safe");
+    turn_off_action:
+      - lambda: |-
+            static_cast< RoombaComponent*> (id(my_roomba).get_component(0))->send_command("passive");
