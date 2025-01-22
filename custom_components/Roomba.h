@@ -530,10 +530,10 @@ class RoombaComponent : public UARTDevice, public CustomAPIDevice, public Pollin
 
 		inline const char* ToString(uint8_t chargeState) {
 			switch (chargeState) {
-				case ChargeStateNotCharging:			return "NotCharging";
-				case ChargeStateReconditioningCharging:	return "ReconditioningCharging";
-				case ChargeStateFullCharging:			return "FullCharging";
-				case ChargeStateTrickleCharging:		return "TrickleCharging";
+				case ChargeStateNotCharging:			return "Not Charging";
+				case ChargeStateReconditioningCharging:	return "Reconditioning Charging";
+				case ChargeStateFullCharging:			return "Full Charging";
+				case ChargeStateTrickleCharging:		return "Trickle Charging";
 				case ChargeStateWaiting:				return "Waiting";
 				case ChargeStateFault:					return "Fault";
 				default:								return "Unknown Charging State";
