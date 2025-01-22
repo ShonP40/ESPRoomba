@@ -291,13 +291,13 @@ class RoombaComponent : public UARTDevice, public CustomAPIDevice, public Pollin
 		void on_command(std::string command) {
 			if (command == "clean") {
 				clean();
-			} else if (command == "dock" || command == "return_to_base") {
+			} else if (command == "dock") {
                 displayString("DOCK");
 				dock();
 			} else if (command == "locate") {
 				locate();
                 displayString("LOC ");
-			} else if (command == "spot" || command == "clean_spot") {
+			} else if (command == "clean_spot") {
 				spot();
 			} else if (command == "wakeup") {
 				brc_wakeup();
@@ -344,7 +344,7 @@ class RoombaComponent : public UARTDevice, public CustomAPIDevice, public Pollin
                 this->speed = 200;
                 displayString("ROTL");
 				drive(this->speed, 0x0001);
-			} else if (command == "stop") {
+			} else if (command == "stop_driving") {
 	            ESP_LOGI("roomba", "STOP");
 				this->speed = 0;
                 displayString("STOP");
