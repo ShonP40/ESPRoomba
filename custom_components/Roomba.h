@@ -16,6 +16,7 @@ class RoombaComponent : public UARTDevice, public CustomAPIDevice, public Pollin
 		Sensor *driveSpeedSensor;
 		TextSensor *oiModeSensor;
 		Sensor *rightMotorCurrentSensor;
+		Sensor *leftMotorCurrentSensor;
         Sensor *mainBrushCurrentSensor;
         Sensor *sideBrushCurrentSensor; 
         BinarySensor *vacuumSensor;   
@@ -64,6 +65,7 @@ class RoombaComponent : public UARTDevice, public CustomAPIDevice, public Pollin
 			uint16_t batteryCapacity;
 			int16_t batteryTemperature;
 			int16_t rightMotorCurrent;
+			int16_t leftMotorCurrent;
             int16_t mainBrushCurrent;
             int16_t sideBrushCurrent;
 
@@ -78,14 +80,15 @@ class RoombaComponent : public UARTDevice, public CustomAPIDevice, public Pollin
 				SensorBatteryTemperature,
 				SensorOIMode,
 				SensorRightMotorCurrent,
+				SensorLeftMotorCurrent
                 SensorMainBrushCurrent,
                 SensorSideBrushCurrent,
 			};
 
-			uint8_t values[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+			uint8_t values[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 			bool success = getSensorsList(sensors, sizeof(sensors), values, sizeof(values));
-      		if (!success) {
+			if (!success) {
 				ESP_LOGD("roomba", "Could not get sensor values from serial");
 				return;
 			}
@@ -98,8 +101,9 @@ class RoombaComponent : public UARTDevice, public CustomAPIDevice, public Pollin
 			batteryTemperature = values[9];
 			std::string oiMode = get_oimode(values[10]);
 			rightMotorCurrent = values[11] * 256 + values[12]; 
-            mainBrushCurrent = values[13] * 256 + values[14];
-            sideBrushCurrent = values[15] * 256 + values[16];
+			leftMotorCurrent = values[13] * 256 + values[14]; 
+            mainBrushCurrent = values[15] * 256 + values[16];
+            sideBrushCurrent = values[17] * 256 + values[18];
 
 			std::string activity = get_activity(charging, current);
 			wasCleaning = activity == "Cleaning";
@@ -156,6 +160,11 @@ class RoombaComponent : public UARTDevice, public CustomAPIDevice, public Pollin
 				this->rightMotorCurrentSensor->publish_state(rightMotorCurrentData);
 			}
 
+			float leftMotorCurrentData = 0.001 * (leftMotorCurrent * 100) / 100;
+            if(this->leftMotorCurrentSensor->state != leftMotorCurrentData) {
+				this->leftMotorCurrentSensor->publish_state(leftMotorCurrentData);
+			}
+
             float mainBrushCurrentData = 0.001 * (mainBrushCurrent * 100) / 100;
             if(this->mainBrushCurrentSensor->state != mainBrushCurrentData) {
 				this->mainBrushCurrentSensor->publish_state(mainBrushCurrentData);
@@ -190,10 +199,11 @@ class RoombaComponent : public UARTDevice, public CustomAPIDevice, public Pollin
 			this->voltageSensor = new Sensor();
 			this->currentSensor = new Sensor();
 			this->batteryChargeSensor = new Sensor();
-	        this->batteryCapacitySensor = new Sensor();
-	        this->batteryPercentSensor = new Sensor();
+			this->batteryCapacitySensor = new Sensor();
+			this->batteryPercentSensor = new Sensor();
 			this->batteryTemperatureSensor = new Sensor();
 			this->rightMotorCurrentSensor = new Sensor();
+			this->leftMotorCurrentSensor = new Sensor();
 			this->mainBrushCurrentSensor = new Sensor();
             this->sideBrushCurrentSensor = new Sensor();
 
@@ -250,6 +260,7 @@ class RoombaComponent : public UARTDevice, public CustomAPIDevice, public Pollin
 			SensorRadius					= 40, //28
 			SensorRightVelocity				= 41, //29
 			SensorLeftVelocity				= 42, //2A
+			SensorLeftMotorCurrent			= 54,
 			SensorRightMotorCurrent			= 55,
             SensorMainBrushCurrent          = 56, //38
             SensorSideBrushCurrent          = 57, //39

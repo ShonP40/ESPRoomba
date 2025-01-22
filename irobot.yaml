@@ -90,7 +90,7 @@ sensor:
   - platform: custom
     lambda: |-
         auto r = ${init}
-        return {r->voltageSensor, r->currentSensor, r->batteryChargeSensor, r->batteryCapacitySensor, r->batteryPercentSensor, r->batteryTemperatureSensor, r->driveSpeedSensor, r->rightMotorCurrentSensor, r->mainBrushCurrentSensor, r->sideBrushCurrentSensor};
+        return {r->voltageSensor, r->currentSensor, r->batteryChargeSensor, r->batteryCapacitySensor, r->batteryPercentSensor, r->batteryTemperatureSensor, r->driveSpeedSensor, r->rightMotorCurrentSensor, r->leftMotorCurrentSensor, r->mainBrushCurrentSensor, r->sideBrushCurrentSensor};
     sensors:
       - name: "${name} voltage"
         unit_of_measurement: "V"
@@ -122,6 +122,10 @@ sensor:
         unit_of_measurement: "mm/s"
         accuracy_decimals: 0
       - name: "${name} right motor current"
+        unit_of_measurement: "A"
+        icon: mdi:lightning-bolt
+        accuracy_decimals: 2
+      - name: "${name} left motor current"
         unit_of_measurement: "A"
         icon: mdi:lightning-bolt
         accuracy_decimals: 2
