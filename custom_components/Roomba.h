@@ -255,6 +255,7 @@ class RoombaComponent : public UARTDevice, public CustomAPIDevice, public Pollin
 
         typedef enum {
             ResetCmd        = 7,   //07
+			PowerOffCmd		= 133,
             StartCmd        = 128, //80
             StopCmd         = 173, //AD
             SafeCmd         = 131, //83
@@ -372,6 +373,9 @@ class RoombaComponent : public UARTDevice, public CustomAPIDevice, public Pollin
             } else if (command == "reset") {
                 ESP_LOGI("roomba", "reset");
                 reset();
+			} else if (command == "poweroff") {
+                ESP_LOGI("roomba", "poweroff");
+                powerOff();
             } else {
                 ESP_LOGE("roomba", "unrecognized command %s", command.c_str());
 			}            
@@ -385,6 +389,10 @@ class RoombaComponent : public UARTDevice, public CustomAPIDevice, public Pollin
         void reset() {
             write(ResetCmd);
         }
+
+		void powerOff() {
+			write(PowerOffCmd);
+		}
 
 		void locate() {
 			uint8_t song[] = {62, 12, 66, 12, 69, 12, 74, 36};
