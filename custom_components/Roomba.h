@@ -525,7 +525,9 @@ class RoombaComponent : public UARTDevice, public CustomAPIDevice, public Pollin
 		}
 
 		void stop() {
-			write(StopCmd);
+			if (wasCleaning) {
+				write(CleanCmd);
+			}
 		}
 
 		void sleep() {
