@@ -76,10 +76,11 @@ binary_sensor:
   - platform: custom
     lambda: |-
         auto r = ${init}
-        return {r->vacuumSensor};
+        return {r->vacuumSensor, r->virtualWallSensor};
     binary_sensors:
       - name: "${name} vacuum state"
         id: "${id}_vacuum"
+      - name: "${name} virtual wall"
 
 sensor:
   - platform: wifi_signal
