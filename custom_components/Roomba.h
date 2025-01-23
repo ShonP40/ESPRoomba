@@ -22,6 +22,7 @@ class RoombaComponent : public UARTDevice, public CustomAPIDevice, public Pollin
         BinarySensor *vacuumSensor;
 		BinarySensor *virtualWallSensor;
 		BinarySensor *chargingSourcesSensor;
+		TextSensor *buttonsSensor;
 
 		static RoombaComponent* instance(uint8_t brcPin, UARTComponent *parent, uint32_t updateInterval, bool lazy650Enabled) {
 			static RoombaComponent* INSTANCE = new RoombaComponent(brcPin, parent, updateInterval, lazy650Enabled);
@@ -72,6 +73,7 @@ class RoombaComponent : public UARTDevice, public CustomAPIDevice, public Pollin
             int16_t sideBrushCurrent;
 			uint8_t virtualWall;
 			uint8_t chargingSources;
+			uint8_t buttons;
 
 			flush();
 
@@ -89,9 +91,10 @@ class RoombaComponent : public UARTDevice, public CustomAPIDevice, public Pollin
                 SensorSideBrushCurrent,
 				SensorVirtualWall,
 				SensorChargingSourcesAvailable,
+				SensorButtons,
 			};
 
-			uint8_t values[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+			uint8_t values[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 			bool success = getSensorsList(sensors, sizeof(sensors), values, sizeof(values));
 			if (!success) {
@@ -112,6 +115,7 @@ class RoombaComponent : public UARTDevice, public CustomAPIDevice, public Pollin
             sideBrushCurrent = values[17] * 256 + values[18];
 			virtualWall = values[19];
 			chargingSources = values[20];
+			buttons = values[21];
 
 			std::string activity = get_activity(charging, current);
 			wasCleaning = activity == "Cleaning";
@@ -195,6 +199,16 @@ class RoombaComponent : public UARTDevice, public CustomAPIDevice, public Pollin
 				this->chargingSourcesSensor->publish_state(true);
 			}
 
+			if (buttons == 1) {
+				this->buttonsSensor->publish_state("Clean");
+			} else if (buttons == 2) {
+				this->buttonsSensor->publish_state("Spot");
+			} else if (buttons == 4) {
+				this->buttonsSensor->publish_state("Dock");
+			} else {
+				this->buttonsSensor->publish_state("None");
+			}
+
 		}
 
         // this function can be called from the Roomba yaml file as 
@@ -235,6 +249,7 @@ class RoombaComponent : public UARTDevice, public CustomAPIDevice, public Pollin
             this->vacuumSensor = new BinarySensor();
 			this->virtualWallSensor = new BinarySensor();
 			this->chargingSourcesSensor = new BinarySensor();
+			this->buttonsSensor = new TextSensor();
 
 		}
 

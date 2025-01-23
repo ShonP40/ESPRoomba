@@ -153,12 +153,13 @@ text_sensor:
   - platform: custom
     lambda: |-
       auto r = ${init}
-      return {r->chargingSensor, r->activitySensor, r->oiModeSensor};
+      return {r->chargingSensor, r->activitySensor, r->oiModeSensor, r->buttonsSensor};
     text_sensors:
       - name: "${name} charging state"
       - name: "${name} activity"
       - name: "${name} OI mode"
         id: "${id}_oi_mode"
+      - name: "${name} pressed button"
 
 button:
   - platform: restart
