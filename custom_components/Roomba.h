@@ -260,8 +260,8 @@ class RoombaComponent : public UARTDevice, public CustomAPIDevice, public Pollin
 			SensorRadius					= 40, //28
 			SensorRightVelocity				= 41, //29
 			SensorLeftVelocity				= 42, //2A
-			SensorLeftMotorCurrent			= 54,
-			SensorRightMotorCurrent			= 55,
+			SensorLeftMotorCurrent			= 54, //36
+			SensorRightMotorCurrent			= 55, //37
             SensorMainBrushCurrent          = 56, //38
             SensorSideBrushCurrent          = 57, //39
 		} SensorCode;
@@ -277,13 +277,13 @@ class RoombaComponent : public UARTDevice, public CustomAPIDevice, public Pollin
 
         typedef enum {
             ResetCmd        = 7,   //07
-			PowerOffCmd		= 133,
+			PowerOffCmd		= 133, //85
             StartCmd        = 128, //80
             StopCmd         = 173, //AD
             SafeCmd         = 131, //83
             FullCmd         = 132, //84
             CleanCmd        = 135, //87
-			MaxCleanCmd		= 136,
+			MaxCleanCmd		= 136, //88
             SpotCmd         = 134, //86
             DockCmd         = 143, //8F
             PowerCmd        = 133, //85
@@ -293,7 +293,7 @@ class RoombaComponent : public UARTDevice, public CustomAPIDevice, public Pollin
             SongCmd         = 140, //8C
             PlayCmd         = 141, //8D
             SensorsListCmd  = 149, //95
-			SetDateCmd		= 168,
+			SetDateCmd		= 168, //A8
         } Commands;      
             
 		void brc_wakeup() {
