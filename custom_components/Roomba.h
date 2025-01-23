@@ -70,8 +70,8 @@ class RoombaComponent : public UARTDevice, public CustomAPIDevice, public Pollin
 			int16_t leftMotorCurrent;
             int16_t mainBrushCurrent;
             int16_t sideBrushCurrent;
-			int8_t virtualWall;
-			int8_t chargingSources;
+			uint8_t virtualWall;
+			uint8_t chargingSources;
 
 			flush();
 
