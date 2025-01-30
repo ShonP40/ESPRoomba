@@ -28,6 +28,9 @@ Smartify your iRobot® using an ESP32-C3 running ESPHome
 - 700 series
 - 800 series
 
+# Connection Diagram
+![Connection Diagram](./connection-diagram.png)
+
 # Credits
 [mannkind](https://github.com/mannkind) - [Original implementation](https://github.com/mannkind/ESPHomeRoombaComponent)
 
