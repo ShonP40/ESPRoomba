@@ -9,6 +9,7 @@ Smartify your iRobot® using an ESP32-C3 running ESPHome
 - Ability to report more advanced sensors (Battery temperature & voltage, General power usage and Motor currents)
 - Ability to restart and power off the `iRobot®`
 - Can be hooked into Home Assistant’s `Template Vacuum` configuration
+- Broadcasts a Bluetooth iBeacon (can be used to track the iRobot®'s location using [ESPresense](https://espresense.com))
 
 # Software Requirements
 - Home Assistant
