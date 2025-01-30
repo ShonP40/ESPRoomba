@@ -6,7 +6,7 @@ Smartify your iRobot® using an ESP32-C3 running ESPHome
 - Ability to command the iRobot® to start normal/spot/max cleaning/stop cleaning and go back to the dock
 - Get a detailed charging status from the iRobot
 - Ability to guess the iRobot®'s status (the [`Roomba® Open Interface (OI)`](./iRobot%20Roomba%20600%20Open%20Interface%20Spec.pdf) doesn't report cleaning status)
-- Ability to report more advanced sensors (Battery temperature & voltage, General power usage and Motor currents)
+- Ability to report more advanced sensors (Battery temperature & voltage, General power usage, Motor currents, the value of the Virtual Wall sensor and which button is being pressed)
 - Ability to restart and power off the `iRobot®`
 - Can be hooked into Home Assistant’s `Template Vacuum` configuration
 - Broadcasts a Bluetooth iBeacon (can be used to track the iRobot®'s location using [ESPresense](https://espresense.com))
