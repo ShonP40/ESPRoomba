@@ -199,12 +199,16 @@ class RoombaComponent : public UARTDevice, public CustomAPIDevice, public Pollin
 				this->chargingSourcesSensor->publish_state(true);
 			}
 
-			if (buttons == 1) {
-				this->buttonsSensor->publish_state("Clean");
-			} else if (buttons == 2) {
-				this->buttonsSensor->publish_state("Spot");
-			} else if (buttons == 4) {
-				this->buttonsSensor->publish_state("Dock");
+			if (!wasDocked) {
+				if (buttons == 1) {
+					this->buttonsSensor->publish_state("Clean");
+				} else if (buttons == 2) {
+					this->buttonsSensor->publish_state("Spot");
+				} else if (buttons == 4) {
+					this->buttonsSensor->publish_state("Dock");
+				} else {
+					this->buttonsSensor->publish_state("None");
+				}
 			} else {
 				this->buttonsSensor->publish_state("None");
 			}
