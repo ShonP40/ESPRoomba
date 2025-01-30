@@ -10,6 +10,7 @@ Smartify your iRobot® using an ESP32-C3 running ESPHome
 - Ability to restart and power off the `iRobot®`
 - Can be hooked into Home Assistant’s `Template Vacuum` configuration
 - Broadcasts a Bluetooth iBeacon (can be used to track the iRobot®'s location using [ESPresense](https://espresense.com))
+- Ability to set the iRobot®'s clock (automatically (daily at 5AM) and manually using Home Assistant)
 
 # Software Requirements
 - Home Assistant

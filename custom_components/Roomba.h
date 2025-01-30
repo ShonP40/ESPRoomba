@@ -440,6 +440,9 @@ class RoombaComponent : public UARTDevice, public CustomAPIDevice, public Pollin
 			} else if (command == "poweroff") {
                 ESP_LOGI("roomba", "poweroff");
                 powerOff();
+			} else if (command == "set_date") {
+				ESP_LOGI("roomba", "set_date");
+				setDate();
             } else {
                 ESP_LOGE("roomba", "unrecognized command %s", command.c_str());
 			}            
@@ -579,6 +582,28 @@ class RoombaComponent : public UARTDevice, public CustomAPIDevice, public Pollin
 			while (available())
 			{
 				read();
+			}
+		}
+
+		void setDate() {
+			auto time_component = id(my_time).now();
+
+			if (time_component.is_valid()) {
+				int day = time_component.day_of_week;
+				int hour = time_component.hour;
+				int minute = time_component.minute;
+			
+				ESP_LOGI("roomba", "Setting current time: %d %02d:%02d", day, hour, minute);
+				
+				write(SetDateCmd);
+				delay(50);
+				write(day);
+				delay(50);
+				write(hour);
+				delay(50);
+				write(minute);
+			} else {
+				ESP_LOGI("roomba", "Time is not valid yet");
 			}
 		}
 

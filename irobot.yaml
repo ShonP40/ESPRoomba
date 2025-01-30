@@ -71,6 +71,16 @@ uart:
 # Enable startup debug info
 debug:
 
+time:
+  - platform: homeassistant
+    id: my_time
+    on_time:
+      - seconds: 0
+        minutes: 0
+        hours: 5
+        then:
+          - button.press: set_date
+
 custom_component:
   - lambda: |-
       auto r = ${init}
@@ -338,6 +348,14 @@ button:
       then:
         - lambda: |-
             static_cast< RoombaComponent*> (id(my_roomba).get_component(0))->send_command("poweroff");
+
+  - platform: template
+    name: Set Date
+    id: set_date
+    on_press:
+      then:
+        - lambda: |-
+            static_cast< RoombaComponent*> (id(my_roomba).get_component(0))->send_command("set_date");
 
 switch:
   - platform: template
