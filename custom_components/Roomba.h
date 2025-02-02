@@ -589,7 +589,7 @@ class RoombaComponent : public UARTDevice, public CustomAPIDevice, public Pollin
 			auto time_component = id(my_time).now();
 
 			if (time_component.is_valid()) {
-				int day = time_component.day_of_week;
+				int day = (time_component.day_of_week) - 1;
 				int hour = time_component.hour;
 				int minute = time_component.minute;
 			
