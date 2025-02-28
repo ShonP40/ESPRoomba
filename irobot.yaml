@@ -16,6 +16,12 @@ esphome:
   includes:
    - custom_components/Roomba.h
 
+external_components:
+  - source:
+      type: git
+      url: https://github.com/robertklep/esphome-custom-component
+    components: [ custom, custom_component ]
+
 esp32:
   board: esp32-c3-devkitm-1
   framework:
