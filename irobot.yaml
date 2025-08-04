@@ -33,6 +33,7 @@ logger:
 
 # Enable Home Assistant API
 api:
+  custom_services: true
 
 preferences:
   flash_write_interval: !secret flash_write_interval
